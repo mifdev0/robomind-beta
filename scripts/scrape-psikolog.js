@@ -30,25 +30,29 @@ async function fetchHtml(url) {
 }
 
 function extractCityLinks(html) {
-  const links = [];
-  const regex = /<a\s+href="([^"]*\/layanan-psikologi-klinis\/[^"]+)"[^>]*>([^<]+)<\/a>/gi;
+  const links = new Map();
+  // Index page: <a href=".../layanan-psikologi-klinis/medan/"> Medan</a> [Provinsi]
+  const regex = /<a\s+href="([^"]*\/layanan-psikologi-klinis\/[a-z0-9-]+)\/?"[^>]*>\s*([^<]+?)\s*<\/a>\s*\[([^\]]+)\]/gi;
   let match;
   while ((match = regex.exec(html)) !== null) {
-    const href = match[1].startsWith('http') ? match[1] : BASE_URL + match[1];
+    let href = match[1].startsWith('http') ? match[1] : 'https://data.ipkindonesia.or.id' + (match[1].startsWith('/') ? '' : '/') + match[1];
+    href = href.replace(/\/+$/, '');
     const name = match[2].trim();
-    if (!links.find(l => l.href === href)) {
-      links.push({ name, href });
+    const provinsi = match[3].trim();
+    if (name && name !== '[-na-]' && !links.has(name)) {
+      links.set(name, { name, href, provinsi });
     }
   }
-  return links;
+  return Array.from(links.values());
 }
 
 function extractPsikologLinks(html) {
   const links = [];
-  const regex = /<a\s+href="([^"]*\/layanan-psikologi-klinis\/[^"]+\/detail\/[^"]+)"[^>]*>([^<]+)<\/a>/gi;
+  // City page: <a href="https://data.ipkindonesia.or.id/psikolog-klinis/medan/nama--ID">Nama</a>
+  const regex = /<a\s+href="([^"]*\/psikolog-klinis\/[^"]+)"[^>]*>([^<]+)<\/a>/gi;
   let match;
   while ((match = regex.exec(html)) !== null) {
-    const href = match[1].startsWith('http') ? match[1] : BASE_URL + match[1];
+    const href = match[1].startsWith('http') ? match[1] : 'https://data.ipkindonesia.or.id' + match[1];
     const name = match[2].trim();
     if (!links.find(l => l.href === href)) {
       links.push({ name, href });
@@ -59,13 +63,37 @@ function extractPsikologLinks(html) {
 
 function extractDetailData(html) {
   const data = {};
-  const tableRegex = /<th[^>]*>([^<]+)<\/th>\s*<td[^>]*>([^<]*)<\/td>/gi;
-  let match;
-  while ((match = tableRegex.exec(html)) !== null) {
-    const key = match[1].trim().toLowerCase().replace(/\s+/g, '_');
-    const value = match[2].trim();
-    data[key] = value;
+
+  const nameMatch = html.match(/<h1>\s*([^<]+?)(?:,\s*)?<\/h1>/i);
+  if (nameMatch) data.nama_lengkap = nameMatch[1].trim();
+
+  const strMatch = html.match(/STR[PK]*\s*[:\s]*([^\s<]+)/i);
+  if (strMatch) data.no_str = strMatch[1].trim();
+
+  const sippkMatch = html.match(/SIPPK[:\s]*([^\s<]+)/i);
+  if (sippkMatch) {
+    const raw = sippkMatch[1].trim();
+    data.no_sippk = raw.replace(/\(ED\..*$/, '').trim();
+    const edMatch = raw.match(/ED\.\s*(\S+)/i);
+    if (edMatch) data.sippk_berlaku = edMatch[1].trim();
   }
+
+  const praktikMatch = html.match(/PRAKTIK\s+MANDIRI[^<]*<\s*\/?\s*strong\s*>\s*-\s*([^<]+?)(?:\s*<a\s|$)/i);
+  if (praktikMatch) data.alamat_praktik = praktikMatch[1].trim();
+
+  const faskesBlocks = html.match(/<span\s+class=['"]item['"][^>]*>([\s\S]*?)<\/span>/gi);
+  if (faskesBlocks) {
+    const praktikBlocks = faskesBlocks.filter(b => !b.includes('NIAIPK') && !b.includes('STR') && !b.includes('SIPPK'));
+    praktikBlocks.forEach(block => {
+      const clean = block.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+      const lines = clean.split('\n').map(l => l.trim()).filter(Boolean);
+      if (lines.length >= 2) {
+        if (!data.nama_faskes) data.nama_faskes = lines[0];
+        if (!data.alamat_praktik) data.alamat_praktik = lines.slice(1).join(', ');
+      }
+    });
+  }
+
   return data;
 }
 
