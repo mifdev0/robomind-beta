@@ -206,6 +206,8 @@ const PsikologFinder = () => {
   }
 
   if (showDropdown && !results && !loading) {
+    const filtered = KOTA_DROPDOWN.filter(k => k && k.toLowerCase().includes(kota.toLowerCase()));
+    const showList = kota.length > 0 && filtered.length > 0;
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
         <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog per Kota</p>
@@ -217,14 +219,22 @@ const PsikologFinder = () => {
               onChange={handleCityInput}
               onKeyDown={handleCityKeyDown}
               placeholder="Ketik nama kota..."
-              list="kota-list"
               className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
             />
-            <datalist id="kota-list">
-              {KOTA_DROPDOWN.filter(k => k).map(k => (
-                <option key={k} value={k} />
-              ))}
-            </datalist>
+            {showList && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-48 overflow-y-auto">
+                {filtered.map(k => (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => { setKota(k); fetchByCity(k); }}
+                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
+                  >
+                    {k}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <button
             onClick={handleCitySearch}
