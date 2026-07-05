@@ -202,17 +202,20 @@ const PsikologFinder = () => {
   if (showDropdown && !results && !loading) {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Pilih Kota</p>
-        <select
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Kota</p>
+        <input
+          type="text"
           value={kota}
           onChange={handleCitySelect}
+          placeholder="Ketik nama kota..."
+          list="kota-list"
           className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
-        >
-          <option value="">-- Pilih Kota --</option>
+        />
+        <datalist id="kota-list">
           {KOTA_DROPDOWN.filter(k => k).map(k => (
-            <option key={k} value={k}>{k}</option>
+            <option key={k} value={k} />
           ))}
-        </select>
+        </datalist>
         <button onClick={() => setShowDropdown(false)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
           Kembali
         </button>
