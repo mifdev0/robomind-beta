@@ -101,14 +101,24 @@ const PsikologFinder = () => {
     setError(null);
 
     navigator.geolocation.getCurrentPosition(
-      async (pos) => {
+      (pos) => {
         const sorted = sortByDistance(pos.coords.latitude, pos.coords.longitude);
-        setResults({ results: sorted, fallback: false });
+        const minDistance = sorted.length > 0 ? sorted[0].jarak_km : Infinity;
+        if (minDistance > 50) {
+          setResults({ results: [], fallback: true });
+        } else {
+          setResults({ results: sorted, fallback: false });
+        }
         setLoading(false);
       },
       () => {
         const sorted = sortByDistance(SURAKARTA_COORDS.lat, SURAKARTA_COORDS.lng);
-        setResults({ results: sorted, fallback: false });
+        const minDistance = sorted.length > 0 ? sorted[0].jarak_km : Infinity;
+        if (minDistance > 50) {
+          setResults({ results: [], fallback: true });
+        } else {
+          setResults({ results: sorted, fallback: false });
+        }
         setLoading(false);
       }
     );
@@ -156,12 +166,33 @@ const PsikologFinder = () => {
     );
   }
 
+  if (results?.fallback) {
+    return (
+      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
+        <p className="text-sm text-gray-600">
+          Belum ada data psikolog di sekitar lokasi Anda. Silakan cari langsung di direktori resmi HIMPSI.
+        </p>
+        <a
+          href="https://www.himpsi.or.id/cari-psikolog"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"
+        >
+          <ExternalLink size={14} /> Kunjungi HIMPSI
+        </a>
+        <button onClick={() => setResults(null)} className="block mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
+          Coba lagi
+        </button>
+      </div>
+    );
+  }
+
   if (results?.results?.length > 0) {
     return (
       <div className="mt-3 space-y-3">
         <div className="flex items-center justify-between">
           <p className="font-fredoka font-bold text-sm text-gray-800">
-            Psikolog di Surakarta ({results.results.length})
+            Psikolog Terdekat ({results.results.length})
           </p>
           <button onClick={() => setResults(null)} className="text-xs text-gray-400 hover:text-gray-600 underline">
             Tutup
