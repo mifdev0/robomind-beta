@@ -1,4 +1,5 @@
-import { MapPin, Phone, ExternalLink, BadgeCheck, Award } from 'lucide-react';
+import { useState } from 'react';
+import { MapPin, ExternalLink, BadgeCheck, Award } from 'lucide-react';
 
 const PSIKOLOG_DATA = [
   { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "Moordiningsih", alamat: "RS PKU Muhammadiyah Surakarta, Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "", no_siap: "20050347", siap_status: "Aktif", no_sipp: "20050347-2023-02-3000", sipp_status: "Aktif", layanan: "Klinikal" },
