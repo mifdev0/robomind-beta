@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, ExternalLink, BadgeCheck, Award } from 'lucide-react';
+import { MapPin, ExternalLink, BadgeCheck, Award, Navigation, Search } from 'lucide-react';
 
 const PSIKOLOG_DATA = [
   { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "Moordiningsih", alamat: "RS PKU Muhammadiyah Surakarta, Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "", no_siap: "20050347", siap_status: "Aktif", no_sipp: "20050347-2023-02-3000", sipp_status: "Aktif", layanan: "Klinikal" },
@@ -131,11 +131,11 @@ const PsikologFinder = () => {
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
         <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog</p>
         <button onClick={checkLocation} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 px-4 py-2.5 rounded-xl transition-colors">
-          📍 Deteksi Lokasi Saya
+          <Navigation size={16} /> Deteksi Lokasi Saya
         </button>
         <div className="flex items-center gap-2 my-3"><span className="flex-1 h-px bg-gray-200" /><span className="text-xs text-gray-400">atau</span><span className="flex-1 h-px bg-gray-200" /></div>
         <button onClick={() => setMode('manual')} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-xl transition-colors">
-          🔍 Cari Manual
+          <Search size={16} /> Cari Manual
         </button>
         <p className="mt-3 text-[10px] text-gray-400">Data tersedia untuk Surakarta/Solo. Kota lain diarahkan ke HIMPSI.</p>
       </div>
