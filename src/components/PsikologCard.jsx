@@ -164,10 +164,16 @@ const PsikologFinder = () => {
     setLoading(false);
   };
 
-  const handleCitySelect = (e) => {
-    const val = e.target.value;
-    setKota(val);
-    if (val) fetchByCity(val);
+  const handleCityInput = (e) => {
+    setKota(e.target.value);
+  };
+
+  const handleCitySearch = () => {
+    if (kota.trim()) fetchByCity(kota.trim());
+  };
+
+  const handleCityKeyDown = (e) => {
+    if (e.key === 'Enter') handleCitySearch();
   };
 
   if (!results && !loading && !showDropdown) {
@@ -202,20 +208,33 @@ const PsikologFinder = () => {
   if (showDropdown && !results && !loading) {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Kota</p>
-        <input
-          type="text"
-          value={kota}
-          onChange={handleCitySelect}
-          placeholder="Ketik nama kota..."
-          list="kota-list"
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
-        />
-        <datalist id="kota-list">
-          {KOTA_DROPDOWN.filter(k => k).map(k => (
-            <option key={k} value={k} />
-          ))}
-        </datalist>
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog per Kota</p>
+        <div className="flex gap-2">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              value={kota}
+              onChange={handleCityInput}
+              onKeyDown={handleCityKeyDown}
+              placeholder="Ketik nama kota..."
+              list="kota-list"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+            />
+            <datalist id="kota-list">
+              {KOTA_DROPDOWN.filter(k => k).map(k => (
+                <option key={k} value={k} />
+              ))}
+            </datalist>
+          </div>
+          <button
+            onClick={handleCitySearch}
+            disabled={!kota.trim()}
+            className="flex items-center justify-center gap-1 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 disabled:opacity-50 px-4 py-2.5 rounded-xl transition-colors shrink-0"
+          >
+            Cari
+          </button>
+        </div>
+        <p className="mt-2 text-[10px] text-gray-400">Kota selain Surakarta/Solo akan diarahkan ke HIMPSI.</p>
         <button onClick={() => setShowDropdown(false)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
           Kembali
         </button>
@@ -248,21 +267,29 @@ const PsikologFinder = () => {
 
   if (results?.fallback) {
     return (
-      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="text-sm text-gray-600">
-          Belum ada data psikolog di kota Anda. Silakan cari langsung di direktori resmi HIMPSI.
-        </p>
-        <a
-          href={results.fallback_url || 'https://himpsi.or.id/cari-psikolog'}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"
-        >
-          <ExternalLink size={14} /> Kunjungi HIMPSI
-        </a>
-        <button onClick={() => { setResults(null); setShowDropdown(false); }} className="block mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
-          Coba lagi
-        </button>
+      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-sm">
+            📋
+          </div>
+          <div className="flex-1">
+            <p className="font-fredoka font-bold text-sm text-amber-800">Data belum tersedia</p>
+            <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+              Database kami saat ini baru tersedia untuk wilayah <strong>Surakarta/Solo</strong>. Untuk kota lain, silakan cari langsung di direktori resmi HIMPSI.
+            </p>
+            <a
+              href={results.fallback_url || 'https://himpsi.or.id/cari-psikolog'}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 px-3 py-2 rounded-xl transition-colors"
+            >
+              <ExternalLink size={14} /> Cari di HIMPSI
+            </a>
+            <button onClick={() => { setResults(null); setShowDropdown(false); }} className="block mt-2 text-xs text-amber-600 hover:text-amber-800 underline">
+              Kembali
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
