@@ -147,7 +147,7 @@ const PsikologFinder = () => {
   const fetchByCity = async (selectedKota) => {
     const isSurakarta = SURAKARTA_ALIASES.some(a => selectedKota.toLowerCase().includes(a));
     if (!isSurakarta) {
-      setResults({ results: [], fallback: true, fallback_url: 'https://www.himpsi.or.id/cari-psikolog' });
+      setResults({ results: [], fallback: true, fallback_url: 'https://himpsi.or.id/cari-psikolog' });
       return;
     }
     setLoading(true);
@@ -250,7 +250,7 @@ const PsikologFinder = () => {
           Belum ada data psikolog di kota Anda. Silakan cari langsung di direktori resmi HIMPSI.
         </p>
         <a
-          href={results.fallback_url || 'https://www.himpsi.or.id/cari-psikolog'}
+          href={results.fallback_url || 'https://himpsi.or.id/cari-psikolog'}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"

@@ -24,7 +24,7 @@ export default async function handler(req, res) {
 
     if (error) return res.status(500).json({ error: 'Database error' });
     if (!data || data.length === 0) {
-      return res.json({ results: [], fallback: true, fallback_url: 'https://www.himpsi.or.id/cari-psikolog' });
+      return res.json({ results: [], fallback: true, fallback_url: 'https://himpsi.or.id/cari-psikolog' });
     }
 
     let results;
@@ -45,7 +45,7 @@ export default async function handler(req, res) {
     res.json({
       results: minDistance <= 50 ? results.slice(0, 15) : [],
       fallback: minDistance > 50 || results.length === 0,
-      fallback_url: 'https://www.himpsi.or.id/cari-psikolog'
+      fallback_url: 'https://himpsi.or.id/cari-psikolog'
     });
   } catch (err) {
     res.status(500).json({ error: 'Internal error' });
