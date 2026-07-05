@@ -1,33 +1,22 @@
-import { useState } from 'react';
-import { MapPin, Phone, ExternalLink, Navigation, Loader2, AlertCircle, RefreshCw, BadgeCheck, Award } from 'lucide-react';
+import { MapPin, Phone, ExternalLink, BadgeCheck, Award } from 'lucide-react';
 
 const PSIKOLOG_DATA = [
-  { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "MOORDININGSIH", alamat: "Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "" },
-  { nama: "UPTD Pusat Layanan Disabilitas & Pendidikan Inklusif", psikolog: "KURNIASIH AYU ARCHENTARI", alamat: "Jl. Agung Timur No. 6A Ngemplak Sutan, Mojosongo, Jebres, Surakarta", telepon: "", jam: "" },
-  { nama: "RS Dr. Oen Kandang Sapi Solo", psikolog: "BERNADETH LESTYOBUDI NOVIHARTANTI", alamat: "Jl. Brigjen Katamso 55, Surakarta", telepon: "", jam: "" },
-  { nama: "Cindo Consulting", psikolog: "CITRA TYAS LAKSMADITA", alamat: "Jl. Blewah Raya 2 No. 11 Karangasem, Surakarta", telepon: "", jam: "" },
-  { nama: "Smart Solindo Consultama", psikolog: "NINDYO PRASETYO", alamat: "Jl. Bromo No.1 Sendangmulyo, Surakarta", telepon: "", jam: "" },
-  { nama: "Smart Solindo Consultama", psikolog: "SEPTI NUZULIA RAHMAWATI", alamat: "Jl. Bromo II, Sendang Mulyo, Kadipiro, Banjarsari, Surakarta", telepon: "", jam: "" },
-  { nama: "Smart Solindo Consultama", psikolog: "DHANANG SETYAWAN", alamat: "Kadipiro, Banjarsari, Surakarta", telepon: "", jam: "" },
-  { nama: "Kantor CG", psikolog: "ORATRI CHRISTY GLORIA SESA", alamat: "Jl. Kabangan 2/2A, Bumi Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "Jaspi Solo", psikolog: "DINA ALFIA RIZA", alamat: "Jl. Latar Putih No.5, Sondakan, Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "Biro Psikologi JASPI", psikolog: "DEWI NURHIDAYATI", alamat: "Jl. Latar Putih No.5, Mutihan, Sondakan, Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "Migunani Consulting", psikolog: "MOHAMMAD ZEIN HIDAYAT", alamat: "Jl. Hasanudin No.18, Purwosari, Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "RSJD Dr. Arif Zainudin", psikolog: "SONIA NATASHA MARUNDUH", alamat: "Jl. Ki Hajar Dewantoro No.80, Jebres, Surakarta", telepon: "", jam: "" },
-  { nama: "Biro Psikologi Asa Psikologi", psikolog: "Berliana Widi Scarvanovi", alamat: "Jl. A. Yani No. 305, Kerten, Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "Layanan Konsultasi Psikologi Dyara", psikolog: "LIENA ASMA' 'ABIEDATUL MUFIEDAH", alamat: "Jl. Blewah Raya I No. 22, Laweyan, Surakarta", telepon: "", jam: "" },
-  { nama: "Klinik Anak Cerdas Ceria", psikolog: "RINA JAYANTI", alamat: "Jl. Letjen Suprapto No.89, Banyuanyar, Surakarta", telepon: "", jam: "" },
+  { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "Moordiningsih", alamat: "RS PKU Muhammadiyah Surakarta, Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "", no_siap: "20050347", siap_status: "Aktif", no_sipp: "20050347-2023-02-3000", sipp_status: "Aktif", layanan: "Klinikal" },
+  { nama: "UPTD Pusat Layanan Disabilitas & Pendidikan Inklusif", psikolog: "Kurniasih Ayu Archentari", alamat: "UPTD Pusat Layanan Disabilitas dan Pendidikan Inklusif, Jl. Agung Timur No. 6A, Ngemplak Sutan, Mojosongo, Jebres, Surakarta", telepon: "", jam: "", no_siap: "20180472", siap_status: "Aktif", no_sipp: "20180472-2025-03-0846", sipp_status: "Aktif", layanan: "Pendidikan, Anak, Keluarga, ABK, Klinikal" },
+  { nama: "RS Dr. Oen Kandang Sapi Solo", psikolog: "Bernadeth Lestyobudi Novihartanti", alamat: "Rumah Sakit Dr. Oen Kandang Sapi Solo, Jl. Brigjen Katamso 55, Surakarta", telepon: "", jam: "", no_siap: "20161601", siap_status: "Aktif", no_sipp: "20161601-2023-01-0678", sipp_status: "Aktif", layanan: "Klinikal" },
+  { nama: "Cindo Consulting", psikolog: "Citra Tyas Laksmadita", alamat: "Cindo Consulting, Jl. Blewah Raya 2 No. 11, Karangasem, Surakarta", telepon: "", jam: "", no_siap: "20181033", siap_status: "Aktif", no_sipp: "20181033-2023-02-1886", sipp_status: "Aktif", layanan: "Pendidikan, Anak, Pernikahan, Industri, Klinikal" },
+  { nama: "Smart Solindo Consultama", psikolog: "Nindyo Prasetyo", alamat: "CV. Smart Solindo Consultama, Jl. Bromo No.1, Sendangmulyo, Surakarta", telepon: "", jam: "", no_siap: "20171557", siap_status: "Aktif", no_sipp: "20171557-2023-02-1134", sipp_status: "Aktif", layanan: "Industri & Organisasi" },
+  { nama: "Smart Solindo Consultama", psikolog: "Septi Nuzulia Rahmawati", alamat: "CV. Smart Solindo Consultama, Jl. Bromo II, Sendang Mulyo, Kadipiro, Banjarsari, Surakarta", telepon: "", jam: "", no_siap: "20210751", siap_status: "Aktif", no_sipp: "20210751-2025-02-2065", sipp_status: "Aktif", layanan: "Industri & Organisasi" },
+  { nama: "Smart Solindo Consultama", psikolog: "Dhanang Setyawan", alamat: "CV. Smart Solindo Consultama, Kadipiro, Banjarsari, Surakarta", telepon: "", jam: "", no_siap: "20190426", siap_status: "Aktif", no_sipp: "20190426-2023-02-3003", sipp_status: "Aktif", layanan: "Industri & Organisasi" },
+  { nama: "Kantor CG", psikolog: "Oratri Christy Gloria Sesa", alamat: "Kantor CG (Belakang Batik Soga), Jl. Kabangan 2/2A, Bumi Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20200190", siap_status: "Aktif", no_sipp: "20200190-2024-02-3601", sipp_status: "Aktif", layanan: "Pendidikan, Anak, Keluarga, Dewasa, Industri, Klinikal" },
+  { nama: "Jaspi Solo", psikolog: "Dina Alfia Riza", alamat: "Jaspi Solo, Jl. Latar Putih No.5, Sondakan, Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20190355", siap_status: "Aktif", no_sipp: "20190355-2025-02-1611", sipp_status: "Aktif", layanan: "Pendidikan" },
+  { nama: "Biro Psikologi JASPI", psikolog: "Dewi Nurhidayati", alamat: "JASPI (Jasa Psikologi Indonesia), Jl. Latar Putih No.5, Mutihan, Sondakan, Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20100408", siap_status: "Aktif", no_sipp: "20100408-2023-02-1974", sipp_status: "Aktif", layanan: "Pendidikan, Anak, Keluarga, ABK, Dewasa, Lansia, Pernikahan, Industri, Klinikal" },
+  { nama: "Migunani Consulting", psikolog: "Mohammad Zein Hidayat", alamat: "Migunani Consulting, Jl. Hasanudin No.18, Purwosari, Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20100886", siap_status: "Aktif", no_sipp: "20100886-2021-02-0998", sipp_status: "Aktif", layanan: "Pendidikan, Anak, Dewasa, Industri" },
+  { nama: "RSJD Dr. Arif Zainudin", psikolog: "Sonia Natasha Marunduh", alamat: "RSJD Dr. Arif Zainudin, Jl. Ki Hajar Dewantoro No.80, Jebres, Surakarta", telepon: "", jam: "", no_siap: "20150783", siap_status: "Aktif", no_sipp: "20150783-2021-02-1496", sipp_status: "Tidak Aktif", layanan: "Dewasa, Klinikal" },
+  { nama: "Biro Psikologi Asa Psikologi", psikolog: "Berliana Widi Scarvanovi", alamat: "Biro Psikologi Asa Psikologi, Jl. A. Yani No. 305, Kerten, Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20181067", siap_status: "Aktif", no_sipp: "20181067-2025-03-1749", sipp_status: "Aktif", layanan: "Klinikal" },
+  { nama: "Layanan Konsultasi Psikologi Dyara", psikolog: "Liena Asma' 'Abiedatul Mufiedah", alamat: "Layanan Konsultasi Psikologi Dyara, Jl. Blewah Raya I No. 22, Laweyan, Surakarta", telepon: "", jam: "", no_siap: "20220127", siap_status: "Aktif", no_sipp: "20220127-2023-01-2234", sipp_status: "Tidak Aktif", layanan: "Keluarga, Dewasa, Lansia, Pernikahan" },
+  { nama: "Klinik Anak Cerdas Ceria", psikolog: "Rina Jayanti", alamat: "Klinik Anak Cerdas Ceria, Jl. Letjen Suprapto No.89, Banyuanyar, Surakarta", telepon: "", jam: "", no_siap: "20161248", siap_status: "Aktif", no_sipp: "20161248-2025-03-2074", sipp_status: "Aktif", layanan: "Anak, Keluarga, ABK, Dewasa, Pernikahan, Klinikal" },
 ];
-
-function haversine(lat1, lng1, lat2, lng2) {
-  const R = 6371;
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLng = (lng2 - lng1) * Math.PI / 180;
-  const a = Math.sin(dLat / 2) ** 2 +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLng / 2) ** 2;
-  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-}
 
 export const parsePsikologRekomendasi = (text) => {
   const match = text.match(/REKOMENDASI PSIKOLOG:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)$/m);
@@ -41,8 +30,7 @@ export const cleanPsikologText = (text) => {
 };
 
 const PsikologCard = ({ data }) => {
-  const alamat = data.alamat_lengkap || data.alamat || '';
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(alamat)}`;
+  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.alamat)}`;
 
   return (
     <div className="bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
@@ -52,7 +40,7 @@ const PsikologCard = ({ data }) => {
         </div>
         <div className="flex-1 min-w-0">
           {data.nama && <p className="font-fredoka font-bold text-sm text-gray-800">{data.nama}</p>}
-          <p className="text-sm font-semibold text-primary-600 mt-0.5">{data.psikolog}{data.gelar ? `, ${data.gelar}` : ''}</p>
+          <p className="text-sm font-semibold text-primary-600 mt-0.5">{data.psikolog}</p>
 
           {data.layanan && (
             <div className="flex flex-wrap gap-1 mt-2">
@@ -77,18 +65,10 @@ const PsikologCard = ({ data }) => {
                 <span>SIPP: <strong>{data.no_sipp}</strong> {data.sipp_status && <span className={`${data.sipp_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({data.sipp_status})</span>}</span>
               </div>
             )}
-            {alamat && (
-              <div className="flex items-start gap-2 text-xs text-gray-600">
-                <MapPin size={14} className="shrink-0 mt-0.5 text-gray-400" />
-                <span>{alamat}</span>
-              </div>
-            )}
-            {data.jarak_km != null && (
-              <div className="flex items-center gap-2 text-xs text-gray-500">
-                <Navigation size={14} className="shrink-0 text-gray-400" />
-                <span>{data.jarak_km} km dari lokasi Anda</span>
-              </div>
-            )}
+            <div className="flex items-start gap-2 text-xs text-gray-600">
+              <MapPin size={14} className="shrink-0 mt-0.5 text-gray-400" />
+              <span>{data.alamat}</span>
+            </div>
           </div>
 
           <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
@@ -103,230 +83,5 @@ const PsikologCard = ({ data }) => {
   );
 };
 
-const KOTA_DROPDOWN = [
-  '', 'Surakarta', 'Solo', 'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta',
-  'Semarang', 'Medan', 'Makassar', 'Palembang', 'Denpasar', 'Malang',
-  'Tangerang', 'Bekasi', 'Depok', 'Bogor', 'Pekanbaru', 'Banjarmasin',
-  'Manado', 'Balikpapan', 'Padang', 'Lampung'
-];
-
-const SURAKARTA_ALIASES = ['surakarta', 'solo', 'surakarta solo'];
-
-const PsikologFinder = () => {
-  const [results, setResults] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [kota, setKota] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-
-  const fetchByLocation = async () => {
-    setShowDropdown(false);
-    if (!navigator.geolocation) {
-      setShowDropdown(true);
-      return;
-    }
-    setLoading(true);
-    setError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        try {
-          const res = await fetch(`/api/psikolog-terdekat?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
-          const data = await res.json();
-          setResults(data);
-        } catch { setError('Gagal memuat data'); }
-        setLoading(false);
-      },
-      () => {
-        setShowDropdown(true);
-        setLoading(false);
-      }
-    );
-  };
-
-  const fetchByCity = async (selectedKota) => {
-    const isSurakarta = SURAKARTA_ALIASES.some(a => selectedKota.toLowerCase().includes(a));
-    if (!isSurakarta) {
-      setResults({ results: [], fallback: true, fallback_url: 'https://himpsi.or.id/cari-psikolog' });
-      return;
-    }
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/psikolog-terdekat');
-      const data = await res.json();
-      if (data.fallback) {
-        setResults(data);
-      } else {
-        setResults({ results: data.results || data, fallback: false });
-      }
-    } catch { setError('Gagal memuat data'); }
-    setLoading(false);
-  };
-
-  const handleCityInput = (e) => {
-    setKota(e.target.value);
-  };
-
-  const handleCitySearch = () => {
-    if (kota.trim()) fetchByCity(kota.trim());
-  };
-
-  const handleCityKeyDown = (e) => {
-    if (e.key === 'Enter') handleCitySearch();
-  };
-
-  if (!results && !loading && !showDropdown) {
-    return (
-      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog Terdekat</p>
-        <button
-          onClick={fetchByLocation}
-          className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 px-4 py-2.5 rounded-xl transition-colors"
-        >
-          <Navigation size={16} />
-          Deteksi Lokasi Saya
-        </button>
-        <div className="flex items-center gap-2 my-3">
-          <span className="flex-1 h-px bg-gray-200" />
-          <span className="text-xs text-gray-400">atau</span>
-          <span className="flex-1 h-px bg-gray-200" />
-        </div>
-        <button
-          onClick={() => setShowDropdown(true)}
-          className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-xl transition-colors"
-        >
-          Pilih Kota Manual
-        </button>
-        <p className="mt-3 text-[10px] text-gray-400 leading-relaxed">
-          Data tersedia untuk Surakarta/Solo. Kota lain akan diarahkan ke HIMPSI.
-        </p>
-      </div>
-    );
-  }
-
-  if (showDropdown && !results && !loading) {
-    const filtered = KOTA_DROPDOWN.filter(k => k && k.toLowerCase().includes(kota.toLowerCase()));
-    const showList = kota.length > 0 && filtered.length > 0;
-    return (
-      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog per Kota</p>
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <input
-              type="text"
-              value={kota}
-              onChange={handleCityInput}
-              onKeyDown={handleCityKeyDown}
-              placeholder="Ketik nama kota..."
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
-            />
-            {showList && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-48 overflow-y-auto">
-                {filtered.map(k => (
-                  <button
-                    key={k}
-                    type="button"
-                    onClick={() => { setKota(k); fetchByCity(k); }}
-                    className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary-50 hover:text-primary-700 transition-colors"
-                  >
-                    {k}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-          <button
-            onClick={handleCitySearch}
-            disabled={!kota.trim()}
-            className="flex items-center justify-center gap-1 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 disabled:opacity-50 px-4 py-2.5 rounded-xl transition-colors shrink-0"
-          >
-            Cari
-          </button>
-        </div>
-        <p className="mt-2 text-[10px] text-gray-400">Kota selain Surakarta/Solo akan diarahkan ke HIMPSI.</p>
-        <button onClick={() => setShowDropdown(false)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
-          Kembali
-        </button>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-6 shadow-sm flex items-center justify-center gap-2 text-sm text-gray-500">
-        <Loader2 size={18} className="animate-spin text-primary-500" />
-        Mencari psikolog terdekat...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="mt-3 bg-white border border-red-100 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-start gap-2 text-sm text-red-600">
-          <AlertCircle size={16} className="shrink-0 mt-0.5" />
-          <p>{error}</p>
-        </div>
-        <button onClick={() => { setResults(null); setError(null); setShowDropdown(false); }} className="mt-2 text-xs text-primary-600 hover:underline flex items-center gap-1">
-          <RefreshCw size={12} /> Coba lagi
-        </button>
-      </div>
-    );
-  }
-
-  if (results?.fallback) {
-    return (
-      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
-        <div className="flex items-start gap-3">
-          <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center shrink-0 text-sm">
-            📋
-          </div>
-          <div className="flex-1">
-            <p className="font-fredoka font-bold text-sm text-amber-800">Data belum tersedia</p>
-            <p className="text-xs text-amber-700 mt-1 leading-relaxed">
-              Database kami saat ini baru tersedia untuk wilayah <strong>Surakarta/Solo</strong>. Untuk kota lain, silakan cari langsung di direktori resmi HIMPSI.
-            </p>
-            <a
-              href={results.fallback_url || 'https://himpsi.or.id/cari-psikolog'}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 px-3 py-2 rounded-xl transition-colors"
-            >
-              <ExternalLink size={14} /> Cari di HIMPSI
-            </a>
-            <button onClick={() => { setResults(null); setShowDropdown(false); }} className="block mt-2 text-xs text-amber-600 hover:text-amber-800 underline">
-              Kembali
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (results?.results?.length > 0) {
-    return (
-      <div className="mt-3 space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="font-fredoka font-bold text-sm text-gray-800">
-            Psikolog Terdekat di Surakarta ({results.results.length})
-          </p>
-          <button onClick={() => { setResults(null); setShowDropdown(false); }} className="text-xs text-gray-400 hover:text-gray-600 underline">
-            Tutup
-          </button>
-        </div>
-        {results.results.map((p, idx) => (
-          <PsikologCard key={idx} data={p} />
-        ))}
-        <p className="text-[10px] text-gray-400 leading-relaxed">
-          Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik sebelum berkunjung.
-        </p>
-      </div>
-    );
-  }
-
-  return null;
-};
-
 export default PsikologCard;
-export { PsikologFinder, PSIKOLOG_DATA };
+export { PSIKOLOG_DATA };
