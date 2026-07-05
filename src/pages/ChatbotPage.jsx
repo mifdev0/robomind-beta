@@ -4,7 +4,7 @@ import { Bot, User, Send, ArrowLeft, Loader2, Paperclip, Mic, X, Image as ImageI
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { generateChatResponse, generateVisionChatResponse } from '../services/api';
-import PsikologCard, { PSIKOLOG_DATA, parsePsikologRekomendasi, cleanPsikologText } from '../components/PsikologCard';
+import { PsikologFinder, cleanPsikologText } from '../components/PsikologCard';
 
 const ChatbotPage = () => {
   const [messages, setMessages] = useState([
@@ -276,15 +276,7 @@ const ChatbotPage = () => {
                       <div className="markdown-content">
                         <ReactMarkdown>{cleanText}</ReactMarkdown>
                       </div>
-                      {hasRekomendasi && (
-                        <div className="mt-3 space-y-3">
-                          <p className="font-fredoka font-bold text-sm text-gray-800">Psikolog di Surakarta</p>
-                          {PSIKOLOG_DATA.map((p, i) => (
-                            <PsikologCard key={i} data={p} />
-                          ))}
-                          <p className="text-[10px] text-gray-400 leading-relaxed">Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik sebelum berkunjung.</p>
-                        </div>
-                      )}
+                      {hasRekomendasi && <PsikologFinder />}
                     </>
                   );
                 })()}

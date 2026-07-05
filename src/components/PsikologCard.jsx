@@ -18,14 +18,14 @@ const PSIKOLOG_DATA = [
   { nama: "Klinik Anak Cerdas Ceria", psikolog: "Rina Jayanti", alamat: "Klinik Anak Cerdas Ceria, Jl. Letjen Suprapto No.89, Banyuanyar, Surakarta", telepon: "", jam: "", no_siap: "20161248", siap_status: "Aktif", no_sipp: "20161248-2025-03-2074", sipp_status: "Aktif", layanan: "Anak, Keluarga, ABK, Dewasa, Pernikahan, Klinikal" },
 ];
 
-export const parsePsikologRekomendasi = (text) => {
+const parsePsikologRekomendasi = (text) => {
   const match = text.match(/REKOMENDASI PSIKOLOG:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)$/m);
   if (!match) return null;
   const [_, psikolog, nama, alamat, telepon] = match;
   return { psikolog: psikolog.trim(), nama: nama.trim(), alamat: alamat.trim(), telepon: telepon.trim(), jam: '' };
 };
 
-export const cleanPsikologText = (text) => {
+const cleanPsikologText = (text) => {
   return text.replace(/\n?REKOMENDASI PSIKOLOG:.*$/m, '').trim();
 };
 
@@ -83,5 +83,107 @@ const PsikologCard = ({ data }) => {
   );
 };
 
+const ALL_KOTA = ['Surakarta', 'Solo', 'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Semarang', 'Medan', 'Makassar', 'Palembang', 'Denpasar', 'Malang', 'Tangerang', 'Bekasi', 'Depok', 'Bogor', 'Pekanbaru', 'Banjarmasin', 'Manado', 'Balikpapan', 'Padang', 'Lampung'];
+
+const PsikologFinder = () => {
+  const [mode, setMode] = useState(null);
+  const [kota, setKota] = useState('');
+  const [filtered, setFiltered] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const SURAKARTA = ['surakarta', 'solo'];
+
+  const checkLocation = () => {
+    if (!navigator.geolocation) { setMode('manual'); return; }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const latSolo = -7.556, lngSolo = 110.831;
+        const R = 6371;
+        const dLat = (latSolo - latitude) * Math.PI / 180;
+        const dLng = (lngSolo - longitude) * Math.PI / 180;
+        const a = Math.sin(dLat/2)**2 + Math.cos(latitude * Math.PI / 180) * Math.cos(latSolo * Math.PI / 180) * Math.sin(dLng/2)**2;
+        const jarak = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        if (jarak <= 50) setMode('surakarta');
+        else setMode('luar');
+      },
+      () => setMode('manual')
+    );
+  };
+
+  const handleManualInput = (e) => {
+    const val = e.target.value;
+    setKota(val);
+    setShowDropdown(val.length > 0);
+    setFiltered(ALL_KOTA.filter(k => k.toLowerCase().includes(val.toLowerCase())));
+  };
+
+  const selectKota = (val) => {
+    setKota(val);
+    setShowDropdown(false);
+    if (SURAKARTA.some(s => val.toLowerCase().includes(s))) setMode('surakarta');
+    else setMode('luar');
+  };
+
+  if (!mode) {
+    return (
+      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog</p>
+        <button onClick={checkLocation} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 px-4 py-2.5 rounded-xl transition-colors">
+          📍 Deteksi Lokasi Saya
+        </button>
+        <div className="flex items-center gap-2 my-3"><span className="flex-1 h-px bg-gray-200" /><span className="text-xs text-gray-400">atau</span><span className="flex-1 h-px bg-gray-200" /></div>
+        <button onClick={() => setMode('manual')} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-xl transition-colors">
+          🔍 Cari Manual
+        </button>
+        <p className="mt-3 text-[10px] text-gray-400">Data tersedia untuk Surakarta/Solo. Kota lain diarahkan ke HIMPSI.</p>
+      </div>
+    );
+  }
+
+  if (mode === 'manual') {
+    return (
+      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Masukkan Nama Kota</p>
+        <div className="relative">
+          <input type="text" value={kota} onChange={handleManualInput} placeholder="Ketik nama kota..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10" />
+          {showDropdown && filtered.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-48 overflow-y-auto">
+              {filtered.map(k => <button key={k} type="button" onClick={() => selectKota(k)} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary-50">{k}</button>)}
+            </div>
+          )}
+        </div>
+        <button onClick={() => setMode(null)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">Kembali</button>
+      </div>
+    );
+  }
+
+  if (mode === 'luar') {
+    return (
+      <div className="mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
+        <p className="font-fredoka font-bold text-sm text-amber-800">Data belum tersedia</p>
+        <p className="text-xs text-amber-700 mt-1">Database saat ini hanya untuk Surakarta/Solo. Silakan cari di direktori HIMPSI.</p>
+        <a href="https://himpsi.or.id/cari-psikolog" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 px-3 py-2 rounded-xl">🔗 Cari di HIMPSI</a>
+        <button onClick={() => setMode(null)} className="block mt-2 text-xs text-amber-600 underline">Kembali</button>
+      </div>
+    );
+  }
+
+  if (mode === 'surakarta') {
+    return (
+      <div className="mt-3 space-y-3">
+        <div className="flex items-center justify-between">
+          <p className="font-fredoka font-bold text-sm text-gray-800">Psikolog di Surakarta ({PSIKOLOG_DATA.length})</p>
+          <button onClick={() => setMode(null)} className="text-xs text-gray-400 underline">Tutup</button>
+        </div>
+        {PSIKOLOG_DATA.map((p, i) => <PsikologCard key={i} data={p} />)}
+        <p className="text-[10px] text-gray-400">Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik.</p>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 export default PsikologCard;
-export { PSIKOLOG_DATA };
+export { PSIKOLOG_DATA, PsikologFinder, parsePsikologRekomendasi, cleanPsikologText, ALL_KOTA }; // juga export ALL_KOTA
