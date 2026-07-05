@@ -103,18 +103,26 @@ const PsikologCard = ({ data }) => {
   );
 };
 
+const KOTA_DROPDOWN = [
+  '', 'Surakarta', 'Solo', 'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta',
+  'Semarang', 'Medan', 'Makassar', 'Palembang', 'Denpasar', 'Malang',
+  'Tangerang', 'Bekasi', 'Depok', 'Bogor', 'Pekanbaru', 'Banjarmasin',
+  'Manado', 'Balikpapan', 'Padang', 'Lampung'
+];
+
+const SURAKARTA_ALIASES = ['surakarta', 'solo', 'surakarta solo'];
+
 const PsikologFinder = () => {
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [kota, setKota] = useState('');
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const fetchByLocation = async () => {
+    setShowDropdown(false);
     if (!navigator.geolocation) {
-      try {
-        const res = await fetch('/api/psikolog-terdekat');
-        const data = await res.json();
-        setResults(data);
-      } catch { setError('Gagal memuat data'); }
+      setShowDropdown(true);
       return;
     }
     setLoading(true);
@@ -129,32 +137,85 @@ const PsikologFinder = () => {
         } catch { setError('Gagal memuat data'); }
         setLoading(false);
       },
-      async () => {
-        try {
-          const res = await fetch('/api/psikolog-terdekat');
-          const data = await res.json();
-          setResults(data);
-        } catch { setError('Gagal memuat data'); }
+      () => {
+        setShowDropdown(true);
         setLoading(false);
       }
     );
   };
 
-  if (!results && !loading) {
+  const fetchByCity = async (selectedKota) => {
+    const isSurakarta = SURAKARTA_ALIASES.some(a => selectedKota.toLowerCase().includes(a));
+    if (!isSurakarta) {
+      setResults({ results: [], fallback: true, fallback_url: 'https://www.himpsi.or.id/cari-psikolog' });
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/psikolog-terdekat');
+      const data = await res.json();
+      if (data.fallback) {
+        setResults(data);
+      } else {
+        setResults({ results: data.results || data, fallback: false });
+      }
+    } catch { setError('Gagal memuat data'); }
+    setLoading(false);
+  };
+
+  const handleCitySelect = (e) => {
+    const val = e.target.value;
+    setKota(val);
+    if (val) fetchByCity(val);
+  };
+
+  if (!results && !loading && !showDropdown) {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Psikolog Terdekat di Surakarta</p>
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog Terdekat</p>
         <button
           onClick={fetchByLocation}
-          disabled={loading}
           className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 px-4 py-2.5 rounded-xl transition-colors"
         >
           <Navigation size={16} />
-          Tampilkan Psikolog Terdekat
+          Deteksi Lokasi Saya
+        </button>
+        <div className="flex items-center gap-2 my-3">
+          <span className="flex-1 h-px bg-gray-200" />
+          <span className="text-xs text-gray-400">atau</span>
+          <span className="flex-1 h-px bg-gray-200" />
+        </div>
+        <button
+          onClick={() => setShowDropdown(true)}
+          className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-xl transition-colors"
+        >
+          Pilih Kota Manual
         </button>
         <p className="mt-3 text-[10px] text-gray-400 leading-relaxed">
-          Data bersumber dari HIMPSI. Jarak dihitung dari lokasi Anda.
+          Data tersedia untuk Surakarta/Solo. Kota lain akan diarahkan ke HIMPSI.
         </p>
+      </div>
+    );
+  }
+
+  if (showDropdown && !results && !loading) {
+    return (
+      <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Pilih Kota</p>
+        <select
+          value={kota}
+          onChange={handleCitySelect}
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10"
+        >
+          <option value="">-- Pilih Kota --</option>
+          {KOTA_DROPDOWN.filter(k => k).map(k => (
+            <option key={k} value={k}>{k}</option>
+          ))}
+        </select>
+        <button onClick={() => setShowDropdown(false)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
+          Kembali
+        </button>
       </div>
     );
   }
@@ -175,7 +236,7 @@ const PsikologFinder = () => {
           <AlertCircle size={16} className="shrink-0 mt-0.5" />
           <p>{error}</p>
         </div>
-        <button onClick={() => { setResults(null); setError(null); }} className="mt-2 text-xs text-primary-600 hover:underline flex items-center gap-1">
+        <button onClick={() => { setResults(null); setError(null); setShowDropdown(false); }} className="mt-2 text-xs text-primary-600 hover:underline flex items-center gap-1">
           <RefreshCw size={12} /> Coba lagi
         </button>
       </div>
@@ -186,17 +247,17 @@ const PsikologFinder = () => {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
         <p className="text-sm text-gray-600">
-          Belum ada data psikolog di sekitar lokasi Anda. Silakan cari langsung di direktori resmi HIMPSI.
+          Belum ada data psikolog di kota Anda. Silakan cari langsung di direktori resmi HIMPSI.
         </p>
         <a
-          href="https://www.himpsi.or.id/cari-psikolog"
+          href={results.fallback_url || 'https://www.himpsi.or.id/cari-psikolog'}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex items-center gap-1 text-sm font-semibold text-primary-600 hover:underline"
         >
           <ExternalLink size={14} /> Kunjungi HIMPSI
         </a>
-        <button onClick={() => setResults(null)} className="block mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
+        <button onClick={() => { setResults(null); setShowDropdown(false); }} className="block mt-2 text-xs text-gray-400 hover:text-gray-600 underline">
           Coba lagi
         </button>
       </div>
@@ -208,9 +269,9 @@ const PsikologFinder = () => {
       <div className="mt-3 space-y-3">
         <div className="flex items-center justify-between">
           <p className="font-fredoka font-bold text-sm text-gray-800">
-            Psikolog Terdekat ({results.results.length})
+            Psikolog Terdekat di Surakarta ({results.results.length})
           </p>
-          <button onClick={() => setResults(null)} className="text-xs text-gray-400 hover:text-gray-600 underline">
+          <button onClick={() => { setResults(null); setShowDropdown(false); }} className="text-xs text-gray-400 hover:text-gray-600 underline">
             Tutup
           </button>
         </div>
