@@ -270,7 +270,8 @@ const ChatbotPage = () => {
                 {/* Render Text Content */}
                 {msg.content && (() => {
                   const hasRekomendasi = /REKOMENDASI PSIKOLOG:/i.test(msg.content);
-                  const cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
+                  let cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
+                  cleanText = cleanText.replace(/^\s*\*{2}\s*$/gm, '');
                   return (
                     <>
                       <div className="markdown-content">

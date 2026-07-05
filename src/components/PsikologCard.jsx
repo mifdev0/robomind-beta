@@ -40,8 +40,8 @@ const PsikologCard = ({ data }) => {
           🧑‍⚕️
         </div>
         <div className="flex-1 min-w-0">
-          {data.nama && <p className="font-fredoka font-bold text-sm text-gray-800">{data.nama}</p>}
-          <p className="text-sm font-semibold text-primary-600 mt-0.5">{data.psikolog}</p>
+          <p className="font-fredoka font-bold text-sm text-gray-800">{data.psikolog}</p>
+          {data.nama && <p className="text-xs font-medium text-gray-500 mt-0.5">{data.nama}</p>}
 
           {data.layanan && (
             <div className="flex flex-wrap gap-1 mt-2">
