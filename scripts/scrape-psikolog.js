@@ -184,21 +184,38 @@ async function main() {
     console.log(`Filter: ${cities.length} kota sesuai "${targetCity}"`);
   }
 
-  // 2. Scrape tiap kota
-  const allData = [];
-  for (let i = 0; i < cities.length; i++) {
-    const results = await scrapeCity(cities[i]);
-    allData.push(...results);
-    console.log(`  Total: ${results.length} psikolog dari ${cities[i].name}`);
-  }
-
-  // 3. Simpan ke file
+  // 2. Scrape tiap kota + simpan incremental
   const fs = await import('fs');
   const dir = outputFile.substring(0, outputFile.lastIndexOf('/'));
   if (dir && !fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
-  fs.writeFileSync(outputFile, JSON.stringify(allData, null, 2));
+
+  // Load data sebelumnya (kalo ada partial hasil)
+  let allData = [];
+  if (fs.existsSync(outputFile)) {
+    try {
+      allData = JSON.parse(fs.readFileSync(outputFile, 'utf-8'));
+      console.log(`Memuat ${allData.length} data sebelumnya dari ${outputFile}`);
+    } catch { allData = []; }
+  }
+
+  for (let i = 0; i < cities.length; i++) {
+    // Skip kalo kota ini udah pernah di-scrape
+    if (allData.some(d => d.kota === cities[i].name)) {
+      console.log(`\n=== ${cities[i].name} === (skip — sudah ada)`);
+      continue;
+    }
+
+    const results = await scrapeCity(cities[i]);
+    allData.push(...results);
+    console.log(`  Total: ${results.length} psikolog dari ${cities[i].name}`);
+
+    // Simpan tiap selesai satu kota
+    fs.writeFileSync(outputFile, JSON.stringify(allData, null, 2));
+    console.log(`  Disimpan ke ${outputFile} (${allData.length} total)`);
+  }
+
   console.log(`\nSelesai! ${allData.length} psikolog tersimpan ke ${outputFile}`);
 }
 
