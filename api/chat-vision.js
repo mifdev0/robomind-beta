@@ -24,10 +24,11 @@ ${JSON.stringify(PSIKOLOG_DUMMY, null, 2)}
 
 ATURAN:
 1. Jika pengguna mengirim **gambar**, analisis dan deskripsikan gambar tersebut dengan ramah dalam bahasa Indonesia.
-2. Jika gambar terkait anak/perkembangan/stress/tantrum, berikan empati dan rekomendasikan konsultasi ke psikolog dari DATA PSIKOLOG ANAK di atas.
-3. Jika gambar tidak relevan, deskripsikan secara umum.
-4. Gunakan bahasa Indonesia yang ramah, hangat, dan santai.
-5. Jawab singkat, padat, jelas (maks 3-4 kalimat).`;
+2. Jika gambar terkait anak/perkembangan ringan, beri saran parenting biasa. JANGAN langsung rekomendasikan psikolog.
+3. Rekomendasikan psikolog dari DATA PSIKOLOG ANAK HANYA jika gambar menunjukkan situasi SANGAT EKSTREM (trauma, kekerasan, darurat). Gunakan format: "REKOMENDASI PSIKOLOG: {nama_psikolog} | {nama_tempat} | {alamat} | {telepon}" di akhir respons.
+4. Jika gambar tidak relevan, deskripsikan secara umum.
+5. Gunakan bahasa Indonesia yang ramah, hangat, dan santai.
+6. Jawab singkat, padat, jelas (maks 3-4 kalimat).`;
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

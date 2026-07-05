@@ -4,6 +4,7 @@ import { Bot, User, Send, ArrowLeft, Loader2, Paperclip, Mic, X, Image as ImageI
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { generateChatResponse, generateVisionChatResponse } from '../services/api';
+import PsikologCard, { parsePsikologRekomendasi, cleanPsikologText } from '../components/PsikologCard';
 
 const ChatbotPage = () => {
   const [messages, setMessages] = useState([
@@ -267,11 +268,18 @@ const ChatbotPage = () => {
                 )}
 
                 {/* Render Text Content */}
-                {msg.content && (
-                  <div className="markdown-content">
-                    <ReactMarkdown>{msg.content}</ReactMarkdown>
-                  </div>
-                )}
+                {msg.content && (() => {
+                  const psikolog = parsePsikologRekomendasi(msg.content);
+                  const cleanText = psikolog ? cleanPsikologText(msg.content) : msg.content;
+                  return (
+                    <>
+                      <div className="markdown-content">
+                        <ReactMarkdown>{cleanText}</ReactMarkdown>
+                      </div>
+                      {psikolog && <PsikologCard data={psikolog} />}
+                    </>
+                  );
+                })()}
               </div>
             </motion.div>
           ))}
