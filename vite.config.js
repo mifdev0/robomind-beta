@@ -203,6 +203,70 @@ export default defineConfig(({ mode }) => {
               }
             });
           });
+
+          server.middlewares.use('/api/psikolog-terdekat', async (req, res) => {
+            if (req.method !== 'GET') {
+              res.statusCode = 405;
+              res.end(JSON.stringify({ error: 'Method not allowed' }));
+              return;
+            }
+            try {
+              const url = new URL(req.url, `http://${req.headers.host}`);
+              const lat = url.searchParams.get('lat');
+              const lng = url.searchParams.get('lng');
+
+              const { createClient } = await import('@supabase/supabase-js');
+              const supabaseUrl = env.VITE_SUPABASE_URL || '';
+              const supabaseKey = env.VITE_SUPABASE_ANON_KEY || '';
+
+              if (!supabaseUrl || !supabaseKey) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: 'Supabase not configured' }));
+                return;
+              }
+
+              const supabase = createClient(supabaseUrl, supabaseKey);
+              const { data, error } = await supabase.from('psikolog').select('*');
+
+              if (error) {
+                res.statusCode = 500;
+                res.end(JSON.stringify({ error: 'Database error' }));
+                return;
+              }
+
+              if (!data || data.length === 0) {
+                res.end(JSON.stringify({ results: [], fallback: true, fallback_url: 'https://www.himpsi.or.id/cari-psikolog' }));
+                return;
+              }
+
+              let results;
+              if (lat && lng) {
+                const userLat = parseFloat(lat);
+                const userLng = parseFloat(lng);
+                const haversine = (a, b, c, d) => {
+                  const R = 6371;
+                  const dLat = (c - a) * Math.PI / 180;
+                  const dLng = (d - b) * Math.PI / 180;
+                  return R * 2 * Math.atan2(Math.sqrt(Math.sin(dLat / 2) ** 2 + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(dLng / 2) ** 2), Math.sqrt(1 - (Math.sin(dLat / 2) ** 2 + Math.cos(a * Math.PI / 180) * Math.cos(c * Math.PI / 180) * Math.sin(dLng / 2) ** 2)));
+                };
+                results = data
+                  .map(d => ({ ...d, jarak_km: Math.round(haversine(userLat, userLng, d.latitude || -7.556, d.longitude || 110.831) * 10) / 10 }))
+                  .sort((a, b) => a.jarak_km - b.jarak_km);
+              } else {
+                results = data;
+              }
+
+              const minDistance = results.length > 0 ? (results[0].jarak_km || 0) : Infinity;
+              res.end(JSON.stringify({
+                results: minDistance <= 50 ? results.slice(0, 15) : [],
+                fallback: minDistance > 50 || results.length === 0,
+                fallback_url: 'https://www.himpsi.or.id/cari-psikolog'
+              }));
+            } catch (err) {
+              res.statusCode = 500;
+              res.end(JSON.stringify({ error: 'Internal error' }));
+            }
+          });
         }
       }
     ],

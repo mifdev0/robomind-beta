@@ -29,8 +29,6 @@ function haversine(lat1, lng1, lat2, lng2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-const SURAKARTA_COORDS = { lat: -7.556, lng: 110.831 };
-
 export const parsePsikologRekomendasi = (text) => {
   const match = text.match(/REKOMENDASI PSIKOLOG:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)$/m);
   if (!match) return null;
@@ -41,12 +39,6 @@ export const parsePsikologRekomendasi = (text) => {
 export const cleanPsikologText = (text) => {
   return text.replace(/\n?REKOMENDASI PSIKOLOG:.*$/m, '').trim();
 };
-
-function sortByDistance(lat, lng) {
-  return [...PSIKOLOG_DATA]
-    .map(d => ({ ...d, jarak_km: Math.round(haversine(lat, lng, SURAKARTA_COORDS.lat, SURAKARTA_COORDS.lng) * 10) / 10 }))
-    .sort((a, b) => a.jarak_km - b.jarak_km);
-}
 
 const PsikologCard = ({ data }) => {
   const alamat = data.alamat_lengkap || data.alamat || '';
@@ -92,33 +84,33 @@ const PsikologFinder = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchByLocation = () => {
+  const fetchByLocation = async () => {
     if (!navigator.geolocation) {
-      setResults({ results: sortByDistance(SURAKARTA_COORDS.lat, SURAKARTA_COORDS.lng), fallback: false });
+      try {
+        const res = await fetch('/api/psikolog-terdekat');
+        const data = await res.json();
+        setResults(data);
+      } catch { setError('Gagal memuat data'); }
       return;
     }
     setLoading(true);
     setError(null);
 
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const sorted = sortByDistance(pos.coords.latitude, pos.coords.longitude);
-        const minDistance = sorted.length > 0 ? sorted[0].jarak_km : Infinity;
-        if (minDistance > 50) {
-          setResults({ results: [], fallback: true });
-        } else {
-          setResults({ results: sorted, fallback: false });
-        }
+      async (pos) => {
+        try {
+          const res = await fetch(`/api/psikolog-terdekat?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+          const data = await res.json();
+          setResults(data);
+        } catch { setError('Gagal memuat data'); }
         setLoading(false);
       },
-      () => {
-        const sorted = sortByDistance(SURAKARTA_COORDS.lat, SURAKARTA_COORDS.lng);
-        const minDistance = sorted.length > 0 ? sorted[0].jarak_km : Infinity;
-        if (minDistance > 50) {
-          setResults({ results: [], fallback: true });
-        } else {
-          setResults({ results: sorted, fallback: false });
-        }
+      async () => {
+        try {
+          const res = await fetch('/api/psikolog-terdekat');
+          const data = await res.json();
+          setResults(data);
+        } catch { setError('Gagal memuat data'); }
         setLoading(false);
       }
     );
