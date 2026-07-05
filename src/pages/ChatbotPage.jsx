@@ -270,7 +270,9 @@ const ChatbotPage = () => {
                 {/* Render Text Content */}
                 {msg.content && (() => {
                   const hasRekomendasi = /REKOMENDASI PSIKOLOG:/i.test(msg.content);
-                  const cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
+                  let cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
+                  // Hapus ** yang berdiri sendiri (tanpa teks) biar ga muncul bintang
+                  cleanText = cleanText.replace(/^\s*\*{2}\s*$/gm, '').replace(/\*{2}(\s*)\*{2}/g, '');
                   return (
                     <>
                       <div className="markdown-content">
