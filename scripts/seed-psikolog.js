@@ -25,7 +25,7 @@ async function main() {
 
   let success = 0;
   for (const d of DATA) {
-    const { error } = await supabase.from('psikolog').upsert(d, { onConflict: 'nama,psikolog' });
+    const { error } = await supabase.from('psikolog').insert(d);
     if (error) {
       console.error(`GAGAL: ${d.psikolog} — ${error.message}`);
     } else {
