@@ -4,7 +4,7 @@ import { Bot, User, Send, ArrowLeft, Loader2, Paperclip, Mic, X, Image as ImageI
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
 import { generateChatResponse, generateVisionChatResponse } from '../services/api';
-import PsikologCard, { parsePsikologRekomendasi, cleanPsikologText } from '../components/PsikologCard';
+import PsikologCard, { PSIKOLOG_DATA, parsePsikologRekomendasi, cleanPsikologText } from '../components/PsikologCard';
 
 const ChatbotPage = () => {
   const [messages, setMessages] = useState([
@@ -269,14 +269,22 @@ const ChatbotPage = () => {
 
                 {/* Render Text Content */}
                 {msg.content && (() => {
-                  const psikolog = parsePsikologRekomendasi(msg.content);
-                  const cleanText = psikolog ? cleanPsikologText(msg.content) : msg.content;
+                  const hasRekomendasi = /REKOMENDASI PSIKOLOG:/i.test(msg.content);
+                  const cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
                   return (
                     <>
                       <div className="markdown-content">
                         <ReactMarkdown>{cleanText}</ReactMarkdown>
                       </div>
-                      {psikolog && <PsikologCard data={psikolog} />}
+                      {hasRekomendasi && (
+                        <div className="mt-3 space-y-3">
+                          <p className="font-fredoka font-bold text-sm text-gray-800">Psikolog di Surakarta</p>
+                          {PSIKOLOG_DATA.map((p, i) => (
+                            <PsikologCard key={i} data={p} />
+                          ))}
+                          <p className="text-[10px] text-gray-400 leading-relaxed">Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik sebelum berkunjung.</p>
+                        </div>
+                      )}
                     </>
                   );
                 })()}
