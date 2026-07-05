@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MapPin, Phone, ExternalLink, Navigation, Search, Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { MapPin, Phone, ExternalLink, Navigation, Loader2, AlertCircle, RefreshCw, BadgeCheck, Award } from 'lucide-react';
 
 const PSIKOLOG_DATA = [
   { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "MOORDININGSIH", alamat: "Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "" },
@@ -51,9 +51,32 @@ const PsikologCard = ({ data }) => {
           🧑‍⚕️
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-fredoka font-bold text-sm text-gray-800">{data.nama}</p>
-          <p className="text-sm font-medium text-primary-600 mt-0.5">{data.psikolog}</p>
+          {data.nama && <p className="font-fredoka font-bold text-sm text-gray-800">{data.nama}</p>}
+          <p className="text-sm font-semibold text-primary-600 mt-0.5">{data.psikolog}{data.gelar ? `, ${data.gelar}` : ''}</p>
+
+          {data.layanan && (
+            <div className="flex flex-wrap gap-1 mt-2">
+              {data.layanan.split(',').map((l, i) => (
+                <span key={i} className="text-[10px] font-medium text-primary-700 bg-primary-50 px-2 py-0.5 rounded-full">
+                  {l.trim()}
+                </span>
+              ))}
+            </div>
+          )}
+
           <div className="mt-2 space-y-1.5">
+            {data.no_siap && (
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <BadgeCheck size={14} className="shrink-0 text-green-500" />
+                <span>SIAP: <strong>{data.no_siap}</strong> {data.siap_status && <span className={`${data.siap_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({data.siap_status})</span>}</span>
+              </div>
+            )}
+            {data.no_sipp && (
+              <div className="flex items-center gap-2 text-xs text-gray-600">
+                <Award size={14} className="shrink-0 text-amber-500" />
+                <span>SIPP: <strong>{data.no_sipp}</strong> {data.sipp_status && <span className={`${data.sipp_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({data.sipp_status})</span>}</span>
+              </div>
+            )}
             {alamat && (
               <div className="flex items-start gap-2 text-xs text-gray-600">
                 <MapPin size={14} className="shrink-0 mt-0.5 text-gray-400" />
@@ -63,10 +86,11 @@ const PsikologCard = ({ data }) => {
             {data.jarak_km != null && (
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Navigation size={14} className="shrink-0 text-gray-400" />
-                <span>{data.jarak_km} km dari Surakarta</span>
+                <span>{data.jarak_km} km dari lokasi Anda</span>
               </div>
             )}
           </div>
+
           <a href={mapsUrl} target="_blank" rel="noopener noreferrer"
             className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 px-3 py-2 rounded-xl transition-colors"
           >
