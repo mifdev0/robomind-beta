@@ -1,3 +1,5 @@
+import landingContext from './_landing-context.js';
+
 const SYSTEM_PROMPT = `Kamu adalah asisten AI bernama Robo Assistant yang membantu orang tua memahami platform Robo Mind.
 
 DESKRIPSI PLATFORM:
