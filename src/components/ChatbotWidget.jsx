@@ -30,26 +30,132 @@ const ChatbotWidget = () => {
     const userMsg = input.trim();
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
-    setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
+
+    const updatedHistory = [...messages, { role: 'user', text: userMsg }];
+    
+    // Add user message & empty assistant placeholder for real-time typing
+    setMessages([...updatedHistory, { role: 'assistant', text: '', isTyping: true }]);
     setLoading(true);
 
     try {
+      const apiMessages = updatedHistory
+        .filter(m => m.text && m.text.trim())
+        .map(m => ({ role: m.role, content: m.text }));
+      const firstUserIdx = apiMessages.findIndex(m => m.role === 'user');
+      const validMessages = firstUserIdx !== -1 ? apiMessages.slice(firstUserIdx) : apiMessages;
+
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: userMsg })
+        body: JSON.stringify({ 
+          message: userMsg,
+          messages: validMessages
+        })
       });
 
-      const data = await res.json();
+      const contentType = res.headers.get('content-type') || '';
+      let accumulatedText = '';
 
-      if (res.ok) {
-        setMessages(prev => [...prev, { role: 'assistant', text: data.reply }]);
-      } else {
-        setMessages(prev => [...prev, { role: 'assistant', text: 'Maaf, terjadi kesalahan. Silakan coba lagi.' }]);
+      if (res.ok && res.body && (contentType.includes('text/event-stream') || contentType.includes('event-stream'))) {
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || trimmed.startsWith(':')) continue;
+            if (trimmed === 'data: [DONE]') break;
+            if (trimmed.startsWith('data: ')) {
+              const jsonStr = trimmed.slice(6);
+              try {
+                const parsed = JSON.parse(jsonStr);
+                const content = parsed.choices?.[0]?.delta?.content || '';
+                if (content) {
+                  accumulatedText += content;
+                  setMessages(prev => {
+                    const newMsgs = [...prev];
+                    const lastIdx = newMsgs.length - 1;
+                    if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+                      newMsgs[lastIdx] = {
+                        ...newMsgs[lastIdx],
+                        text: accumulatedText,
+                        isTyping: true
+                      };
+                    }
+                    return newMsgs;
+                  });
+                }
+              } catch {
+                // Ignore parse errors on partial JSON chunks
+              }
+            }
+          }
+        }
+      }
+
+      // If no text was accumulated (non-streaming fallback or error)
+      if (!accumulatedText) {
+        let fullText = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+        try {
+          const data = await res.json();
+          if (data.reply) fullText = data.reply;
+          else if (data.error) fullText = typeof data.error === 'string' ? data.error : 'Terjadi kesalahan pada server API.';
+        } catch {
+          if (!res.ok) fullText = 'Maaf, koneksi terputus. Silakan coba lagi.';
+        }
+
+        // Animate fallback text char by char like typing
+        for (let i = 1; i <= fullText.length; i++) {
+          const slicedText = fullText.slice(0, i);
+          setMessages(prev => {
+            const newMsgs = [...prev];
+            const lastIdx = newMsgs.length - 1;
+            if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+              newMsgs[lastIdx] = {
+                ...newMsgs[lastIdx],
+                text: slicedText,
+                isTyping: true
+              };
+            }
+            return newMsgs;
+          });
+          await new Promise(r => setTimeout(r, 12));
+        }
       }
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Maaf, koneksi terputus. Silakan coba lagi.' }]);
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        const lastIdx = newMsgs.length - 1;
+        if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+          newMsgs[lastIdx] = {
+            ...newMsgs[lastIdx],
+            text: 'Maaf, koneksi terputus. Silakan coba lagi.',
+            isTyping: false
+          };
+        }
+        return newMsgs;
+      });
     } finally {
+      // Remove typing flag once done
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        const lastIdx = newMsgs.length - 1;
+        if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+          newMsgs[lastIdx] = {
+            ...newMsgs[lastIdx],
+            isTyping: false
+          };
+        }
+        return newMsgs;
+      });
       setLoading(false);
     }
   };
@@ -105,22 +211,23 @@ const ChatbotWidget = () => {
                       ? 'bg-primary-500 text-white rounded-tr-none'
                       : 'bg-white border border-gray-100 shadow-sm text-gray-700 rounded-tl-none'
                   }`}>
-                    <div className="markdown-content">
-                      <ReactMarkdown>{msg.text}</ReactMarkdown>
-                    </div>
+                    {msg.role === 'assistant' && !msg.text && msg.isTyping ? (
+                      <div className="flex items-center gap-1.5 py-1 px-1">
+                        <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                        <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                        <span className="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                      </div>
+                    ) : (
+                      <div className="markdown-content">
+                        <ReactMarkdown>{msg.text}</ReactMarkdown>
+                        {msg.isTyping && (
+                          <span className="inline-block w-2 h-4 ml-1 bg-primary-500 rounded-xs animate-pulse align-middle" />
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}
-              {loading && (
-                <div className="flex gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
-                    <Bot size={16} className="text-primary-600" />
-                  </div>
-                  <div className="bg-white p-3 rounded-2xl rounded-tl-none shadow-sm border border-gray-100 text-sm text-gray-500">
-                    <span className="animate-pulse">Mengetik...</span>
-                  </div>
-                </div>
-              )}
               <div ref={chatEndRef} />
             </div>
 
@@ -163,3 +270,4 @@ const ChatbotWidget = () => {
 };
 
 export default ChatbotWidget;
+

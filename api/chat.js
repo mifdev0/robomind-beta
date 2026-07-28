@@ -29,13 +29,17 @@ export default async function handler(req, res) {
   }
 
   try {
-    const { message, messages } = req.body;
+    const { message, messages, stream } = req.body || {};
 
-    let finalMessages;
+    let finalMessages = [];
     if (messages && Array.isArray(messages)) {
+      const formatted = messages.filter(m => m && m.role && m.content);
+      const firstUserIdx = formatted.findIndex(m => m.role === 'user');
+      const validHistory = firstUserIdx !== -1 ? formatted.slice(firstUserIdx) : formatted;
+
       finalMessages = [
         { role: 'system', content: SYSTEM_PROMPT },
-        ...messages
+        ...validHistory
       ];
     } else if (message && typeof message === 'string') {
       finalMessages = [
@@ -56,22 +60,48 @@ export default async function handler(req, res) {
         model: 'deepseek-chat',
         messages: finalMessages,
         temperature: 0.3,
-        max_tokens: 500
+        max_tokens: 500,
+        stream: !!stream
       })
     });
 
-    const data = await response.json();
+    if (stream) {
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        console.error('DeepSeek API error:', data);
+        return res.status(response.status).json({ error: data.error?.message || data.error || 'API request failed' });
+      }
 
-    if (!response.ok) {
-      console.error('DeepSeek API error:', data);
-      return res.status(response.status).json({ error: 'API request failed' });
+      res.setHeader('Content-Type', 'text/event-stream');
+      res.setHeader('Cache-Control', 'no-cache, no-transform');
+      res.setHeader('Connection', 'keep-alive');
+
+      const reader = response.body.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        res.write(value);
+        if (typeof res.flush === 'function') res.flush();
+      }
+      res.end();
+    } else {
+      // Non-streaming JSON mode
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        console.error('DeepSeek API error:', data);
+        return res.status(response.status).json({ error: data.error?.message || data.error || 'API request failed' });
+      }
+      const reply = data.choices?.[0]?.message?.content || 'Maaf, saya tidak bisa menjawab pertanyaan itu.';
+      res.json({ reply });
     }
-
-    const reply = data.choices[0]?.message?.content || 'Maaf, saya tidak bisa menjawab pertanyaan itu.';
-
-    res.json({ reply });
   } catch (error) {
     console.error('Server error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Internal server error' });
+    } else {
+      res.end();
+    }
   }
 }
+
+

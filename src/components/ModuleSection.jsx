@@ -1,5 +1,6 @@
 import { Lock } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 const ModuleSection = () => {
   const { i18n } = useTranslation();
@@ -57,18 +58,31 @@ const ModuleSection = () => {
   return (
     <section id="modul-pembelajaran" className="bg-gray-50 py-10 sm:py-16 lg:py-24 border-b border-gray-100 w-full relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-8 sm:mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-8 sm:mb-12"
+        >
           <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 font-fredoka uppercase tracking-tight">
             {i18n.language === 'en' ? 'Learning Modules' : 'Modul Pembelajaran'}
           </h2>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-600 font-outfit max-w-2xl mx-auto px-2">
             {i18n.language === 'en' ? 'Improve your child\'s logic and creativity through interactive modules specially designed for fun learning.' : 'Tingkatkan kemampuan logika dan kreativitas anak melalui modul-modul interaktif yang dirancang khusus untuk pembelajaran menyenangkan.'}
           </p>
-        </div>
+        </motion.div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {modules.map((modul) => (
-            <div key={modul.id} className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col relative">
+          {modules.map((modul, idx) => (
+            <motion.div 
+              key={modul.id} 
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-50px" }}
+              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-800 group flex flex-col relative"
+            >
               <div className="relative aspect-[4/3] w-full overflow-hidden">
                 <img 
                   src={modul.img} 
@@ -97,24 +111,30 @@ const ModuleSection = () => {
                   {modul.description}
                 </p>
                 {modul.isLocked ? (
-                  <button className="w-full py-2.5 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-gray-800 to-black hover:from-black hover:to-gray-900 text-white font-bold rounded-lg sm:rounded-xl transition-all font-outfit flex justify-center items-center gap-2 shadow-md text-xs sm:text-sm">
+                  <button className="w-full py-2.5 sm:py-3 px-3 sm:px-4 bg-gradient-to-r from-gray-800 to-black hover:from-black hover:to-gray-900 text-white font-bold rounded-lg sm:rounded-xl transition-all font-outfit flex justify-center items-center gap-2 shadow-md text-xs sm:text-sm cursor-pointer">
                     {i18n.language === 'en' ? 'Subscribe to Unlock' : 'Berlangganan untuk Membuka'}
                   </button>
                 ) : (
-                  <button className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 ${modul.price === 'Gratis' || modul.price === 'Free' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold rounded-lg sm:rounded-xl transition-colors font-outfit shadow-md hover:shadow-lg text-xs sm:text-sm`}>
+                  <button className={`w-full py-2.5 sm:py-3 px-3 sm:px-4 ${modul.price === 'Gratis' || modul.price === 'Free' ? 'bg-green-500 hover:bg-green-600' : 'bg-blue-600 hover:bg-blue-700'} text-white font-bold rounded-lg sm:rounded-xl transition-colors font-outfit shadow-md hover:shadow-lg text-xs sm:text-sm cursor-pointer`}>
                     {modul.price === 'Gratis' || modul.price === 'Free' ? (i18n.language === 'en' ? 'Start Learning' : 'Mulai Belajar') : (i18n.language === 'en' ? 'Buy Module' : 'Beli Modul')}
                   </button>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
         
-        <div className="mt-8 sm:mt-12 text-center">
-          <button className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 hover:border-gray-900 text-gray-900 font-bold rounded-full transition-colors font-outfit uppercase tracking-wider text-xs sm:text-sm shadow-sm hover:shadow-md">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="mt-8 sm:mt-12 text-center"
+        >
+          <button className="px-6 sm:px-8 py-2.5 sm:py-3 bg-white border-2 border-gray-200 hover:border-gray-900 text-gray-900 font-bold rounded-full transition-colors font-outfit uppercase tracking-wider text-xs sm:text-sm shadow-sm hover:shadow-md cursor-pointer">
             {i18n.language === 'en' ? 'View All Modules' : 'Lihat Semua Modul'}
           </button>
-        </div>
+        </motion.div>
       </div>
     </section>
   );

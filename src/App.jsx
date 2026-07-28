@@ -5,6 +5,10 @@ import ScreeningPage from './pages/ScreeningPage';
 import FeaturesPage from './pages/FeaturesPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import CommunityPage from './pages/CommunityPage';
+import TreatmentPage from './pages/TreatmentPage';
+import ResearchPage from './pages/ResearchPage';
+import InsightPage from './pages/InsightPage';
 
 function App() {
   return (
@@ -16,6 +20,10 @@ function App() {
         <Route path="/games" element={<FeaturesPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+        <Route path="/community" element={<CommunityPage />} />
+        <Route path="/treatment" element={<TreatmentPage />} />
+        <Route path="/the-research" element={<ResearchPage />} />
+        <Route path="/insight" element={<InsightPage />} />
       </Routes>
     </Router>
   );
