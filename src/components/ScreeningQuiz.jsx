@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar } from 'react-chartjs-2';
@@ -92,20 +92,29 @@ const ScreeningQuiz = () => {
     setIsSubmitted(true);
   };
 
+  // Automatically scroll to the top of the page smoothly when current page or submission state changes
+  useEffect(() => {
+    const handleScroll = () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    const timer = setTimeout(handleScroll, 80);
+    return () => clearTimeout(timer);
+  }, [currentPage, isSubmitted]);
+
   const nextStep = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(prev => prev + 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       calculateResults();
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentPage > 0) {
       setCurrentPage(prev => prev - 1);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
