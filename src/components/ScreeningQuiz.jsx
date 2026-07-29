@@ -95,17 +95,17 @@ const ScreeningQuiz = () => {
   const nextStep = () => {
     if (currentPage < totalPages - 1) {
       setCurrentPage(prev => prev + 1);
-      window.scrollTo({ top: document.getElementById('skrining-quiz-section').offsetTop - 100, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
       calculateResults();
-      window.scrollTo({ top: document.getElementById('skrining-quiz-section').offsetTop - 100, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
   const prevStep = () => {
     if (currentPage > 0) {
       setCurrentPage(prev => prev - 1);
-      window.scrollTo({ top: document.getElementById('skrining-quiz-section').offsetTop - 100, behavior: 'smooth' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
