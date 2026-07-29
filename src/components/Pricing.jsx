@@ -200,6 +200,32 @@ const Pricing = () => {
     window.dispatchEvent(new Event('subscriptionChange'));
   };
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.05
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.92, rotate: 1 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      rotate: 0,
+      transition: { 
+        type: "spring",
+        stiffness: 70,
+        damping: 14
+      } 
+    }
+  };
+
   return (
     <section id="berlangganan" className="py-14 sm:py-20 lg:py-24 bg-white dark:bg-slate-900 relative overflow-hidden transition-colors duration-200">
       <div className="absolute top-0 inset-x-0 h-48 sm:h-64 bg-gradient-to-b from-primary-50 to-white dark:from-primary-950/20 dark:to-slate-900 z-0" />
@@ -214,7 +240,13 @@ const Pricing = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto items-stretch">
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 lg:gap-8 max-w-7xl mx-auto items-stretch"
+        >
           {plans.map((plan) => {
             const isFeatured = plan.featured;
             const cardStyles = plan.styles.card;
@@ -222,8 +254,12 @@ const Pricing = () => {
             return (
               <motion.div 
                 key={plan.id}
-                whileHover={{ y: -8, scale: 1.01 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                variants={cardVariants}
+                whileHover={{ 
+                  y: -12, 
+                  scale: 1.03,
+                  boxShadow: "0 25px 30px -5px rgb(0 0 0 / 0.15), 0 10px 12px -6px rgb(0 0 0 / 0.15)"
+                }}
                 className={`rounded-2xl sm:rounded-3xl p-6 sm:p-8 border transition-all flex flex-col justify-between relative overflow-hidden ${cardStyles}`}
               >
                 {isFeatured && plan.badge && (
@@ -281,7 +317,7 @@ const Pricing = () => {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
       </div>
 
       {/* Manual Payment Gateway Modal */}
