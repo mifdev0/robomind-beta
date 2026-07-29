@@ -55,6 +55,31 @@ const ModuleSection = () => {
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.05
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.94 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      transition: { 
+        type: "spring",
+        stiffness: 80,
+        damping: 14
+      } 
+    }
+  };
+
   return (
     <section id="modul-pembelajaran" className="bg-gray-50 py-10 sm:py-16 lg:py-24 border-b border-gray-100 w-full relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -73,14 +98,22 @@ const ModuleSection = () => {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-          {modules.map((modul, idx) => (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8"
+        >
+          {modules.map((modul) => (
             <motion.div 
               key={modul.id} 
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-50px" }}
-              transition={{ duration: 0.5, delay: idx * 0.08 }}
+              variants={cardVariants}
+              whileHover={{ 
+                y: -8, 
+                scale: 1.02,
+                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+              }}
               className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-800 group flex flex-col relative"
             >
               <div className="relative aspect-[4/3] w-full overflow-hidden">
@@ -122,7 +155,7 @@ const ModuleSection = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
         
         <motion.div 
           initial={{ opacity: 0, y: 20 }}

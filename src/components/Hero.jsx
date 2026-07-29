@@ -136,23 +136,25 @@ const Hero = () => {
                     {i18n.language === 'en' ? 'Ask Chatbot' : 'Tanya Chatbot'}
                   </motion.a>
                   
-                  <motion.a 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href="/community" 
-                    className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/20 backdrop-blur-sm transition-colors"
-                  >
-                    {i18n.language === 'en' ? 'Community' : 'Komunitas'}
-                  </motion.a>
+                  <div className="flex flex-col gap-2.5 w-full sm:flex-row sm:gap-4 sm:w-auto sm:justify-center">
+                    <motion.a 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      href="/community" 
+                      className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/20 backdrop-blur-sm transition-colors"
+                    >
+                      {i18n.language === 'en' ? 'Community' : 'Komunitas'}
+                    </motion.a>
 
-                  <motion.a 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    href="#" 
-                    className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/20 backdrop-blur-sm transition-colors"
-                  >
-                    {i18n.language === 'en' ? 'Play Now' : 'Mainkan Sekarang'}
-                  </motion.a>
+                    <motion.a 
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      href="#" 
+                      className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/10 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/20 backdrop-blur-sm transition-colors"
+                    >
+                      {i18n.language === 'en' ? 'Play Now' : 'Mainkan Sekarang'}
+                    </motion.a>
+                  </div>
                 </div>
               </motion.div>
             </div>

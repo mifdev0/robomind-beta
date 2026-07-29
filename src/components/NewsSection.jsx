@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ExternalLink, Calendar } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { motion } from 'framer-motion';
 
 const NewsSection = () => {
   const { i18n } = useTranslation();
@@ -90,6 +91,31 @@ const NewsSection = () => {
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+        delayChildren: 0.05
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.94 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      transition: { 
+        type: "spring",
+        stiffness: 80,
+        damping: 14
+      } 
+    }
+  };
+
   return (
     <section id="berita-terupdate" className="bg-white dark:bg-slate-900 py-10 sm:py-16 lg:py-24 border-b border-gray-100 dark:border-slate-800 w-full relative transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -117,13 +143,25 @@ const NewsSection = () => {
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <motion.div 
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
+          >
             {news.map((item) => (
-              <a 
+              <motion.a 
                 key={item.id} 
                 href={item.url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
+                variants={cardVariants}
+                whileHover={{ 
+                  y: -10, 
+                  scale: 1.02,
+                  boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+                }}
                 className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-800 group flex flex-col"
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
@@ -150,9 +188,9 @@ const NewsSection = () => {
                     {i18n.language === 'en' ? 'Read More' : 'Baca Selengkapnya'} <ExternalLink size={12} className="sm:size-[16] ml-1.5 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300" />
                   </div>
                 </div>
-              </a>
+              </motion.a>
             ))}
-          </div>
+          </motion.div>
         )}
         
         <div className="mt-6 sm:mt-8 text-center sm:hidden">

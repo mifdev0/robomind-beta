@@ -9,14 +9,25 @@ const ScreeningPillars = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.2
+        staggerChildren: 0.15,
+        delayChildren: 0.05
       }
     }
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, x: -30 },
-    visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: "easeOut" } }
+    hidden: { opacity: 0, y: 50, scale: 0.92, rotate: -1 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      rotate: 0,
+      transition: { 
+        type: "spring",
+        stiffness: 80,
+        damping: 14
+      } 
+    }
   };
 
   const pillars = [
@@ -60,13 +71,18 @@ const ScreeningPillars = () => {
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-80px" }}
         >
           {pillars.map((pillar) => (
             <motion.div 
               key={pillar.id}
               variants={itemVariants}
-              className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm sm:shadow-lg hover:shadow-xl transition-shadow bg-white relative overflow-hidden group"
+              whileHover={{ 
+                y: -10, 
+                scale: 1.02,
+                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+              }}
+              className="p-5 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm sm:shadow-lg bg-white relative overflow-hidden group transition-all duration-300"
             >
               <div className={`w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 rounded-xl sm:rounded-2xl ${pillar.bgColor} flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-110 transition-transform`}>
                 {pillar.icon}

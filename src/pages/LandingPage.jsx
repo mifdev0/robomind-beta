@@ -11,6 +11,7 @@ import Footer from '../components/Footer';
 import ChatbotWidget from '../components/ChatbotWidget';
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { ScrollProgressBar, ScrollToTopButton, ScrollReveal } from '../components/ScrollEffects';
 
 const LandingPage = () => {
   const location = useLocation();
@@ -27,17 +28,30 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen font-outfit text-gray-800 bg-white overflow-x-hidden">
       <Navbar />
+      <ScrollProgressBar />
       <main>
         <Hero />
+        
         <WhyRoboMind />
-        <GameSlider />
+        
+        <ScrollReveal animation="scale-up" duration={0.9} threshold={0.15}>
+          <GameSlider />
+        </ScrollReveal>
+        
         <ModuleSection />
+        
         <ScreeningPillars />
-        <ParentDashboard />
+        
+        <ScrollReveal animation="fade-left" duration={0.8} threshold={0.15}>
+          <ParentDashboard />
+        </ScrollReveal>
+        
         <Pricing />
+        
         <NewsSection />
       </main>
       <Footer />
+      <ScrollToTopButton />
       <ChatbotWidget />
     </div>
   );

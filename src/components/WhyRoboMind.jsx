@@ -34,6 +34,32 @@ const WhyRoboMind = () => {
     }
   ];
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15,
+        delayChildren: 0.1
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 60, scale: 0.92, rotate: -1 },
+    visible: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1, 
+      rotate: 0,
+      transition: { 
+        type: "spring",
+        stiffness: 80,
+        damping: 14
+      } 
+    }
+  };
+
   return (
     <section className="py-14 sm:py-20 lg:py-24 bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -49,15 +75,23 @@ const WhyRoboMind = () => {
         </div>
 
         {/* 3-Column Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
-          {items.map((item, idx) => (
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-80px" }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12"
+        >
+          {items.map((item) => (
             <motion.div 
               key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
-              className="flex flex-col items-center text-center p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/80 shadow-sm hover:shadow-md transition-all duration-300"
+              variants={cardVariants}
+              whileHover={{ 
+                y: -10, 
+                scale: 1.02,
+                boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)"
+              }}
+              className="flex flex-col items-center text-center p-6 bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700/80 shadow-sm transition-all duration-300"
             >
               {/* Icon Wrapper */}
               <div className="p-4 bg-gray-50 dark:bg-slate-900 rounded-full mb-6 flex items-center justify-center border border-gray-100 dark:border-slate-800 shadow-inner">
@@ -85,7 +119,7 @@ const WhyRoboMind = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
 
       </div>
     </section>

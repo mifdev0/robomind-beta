@@ -9,10 +9,12 @@ import CommunityPage from './pages/CommunityPage';
 import TreatmentPage from './pages/TreatmentPage';
 import ResearchPage from './pages/ResearchPage';
 import InsightPage from './pages/InsightPage';
+import RobotCursor from './components/RobotCursor';
 
 function App() {
   return (
     <Router>
+      <RobotCursor />
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/chatbot" element={<ChatbotPage />} />
