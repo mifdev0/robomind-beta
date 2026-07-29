@@ -201,8 +201,8 @@ const Pricing = () => {
   };
 
   return (
-    <section id="berlangganan" className="py-14 sm:py-20 lg:py-24 bg-white relative overflow-hidden">
-      <div className="absolute top-0 inset-x-0 h-48 sm:h-64 bg-gradient-to-b from-primary-50 to-white z-0" />
+    <section id="berlangganan" className="py-14 sm:py-20 lg:py-24 bg-white dark:bg-slate-900 relative overflow-hidden transition-colors duration-200">
+      <div className="absolute top-0 inset-x-0 h-48 sm:h-64 bg-gradient-to-b from-primary-50 to-white dark:from-primary-950/20 dark:to-slate-900 z-0" />
       
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">

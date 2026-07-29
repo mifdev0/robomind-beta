@@ -2,6 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay } from 'swiper/modules';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import 'swiper/css';
 
 const GameSlider = () => {
@@ -34,16 +35,28 @@ const GameSlider = () => {
   return (
     <section id="fitur-game" className="bg-white py-12 border-b border-gray-100 overflow-hidden relative w-full">
       <div className="w-full mx-auto">
-        <div className="px-4 sm:px-6 lg:px-8 mb-6 flex justify-between items-end max-w-[1920px] mx-auto">
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.6 }}
+          className="px-4 sm:px-6 lg:px-8 mb-6 flex justify-between items-end max-w-[1920px] mx-auto"
+        >
           <h2 className="text-xl sm:text-2xl md:text-3xl font-extrabold text-gray-900 font-fredoka uppercase tracking-tight">
             {i18n.language === 'en' ? 'Explore Game Features' : 'Eksplorasi Fitur Game'}
           </h2>
           <Link to="/games" className="text-sm font-bold text-black border-b border-black pb-0.5 hover:text-gray-600 transition-colors hidden sm:block shrink-0 ml-4">
             {i18n.language === 'en' ? 'View All Game Features' : 'Lihat Semua Fitur Game'}
           </Link>
-        </div>
+        </motion.div>
 
-        <div className="w-full">
+        <motion.div 
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.7, delay: 0.1 }}
+          className="w-full"
+        >
           <Swiper
             modules={[Autoplay]}
             loop={true}
@@ -100,7 +113,7 @@ const GameSlider = () => {
               </SwiperSlide>
             ))}
           </Swiper>
-        </div>
+        </motion.div>
       </div>
 
       <style>{`

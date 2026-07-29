@@ -151,45 +151,178 @@ const ChatbotPage = () => {
       fileName: selectedFile?.name
     };
 
-    setMessages(prev => [...prev, userMessage]);
+    const updatedHistory = [...messages, userMessage];
+    
+    // Add user message & empty assistant placeholder for real-time typing
+    setMessages([...updatedHistory, { role: 'assistant', content: '', isTyping: true }]);
     
     setInput('');
     if (textareaRef.current) textareaRef.current.style.height = 'auto';
     setIsLoading(true);
 
-    const apiMessages = messages.map(msg => ({ role: msg.role, content: msg.content || '[Media]' }));
-
     const isImage = selectedFile && selectedFile.type.startsWith('image/');
 
-    if (isImage) {
-      const reader = new FileReader();
-      reader.readAsDataURL(selectedFile);
-      const imageDataUrl = await new Promise((resolve) => {
-        reader.onload = () => resolve(reader.result);
-      });
+    try {
+      if (isImage) {
+        const reader = new FileReader();
+        reader.readAsDataURL(selectedFile);
+        const imageDataUrl = await new Promise((resolve) => {
+          reader.onload = () => resolve(reader.result);
+        });
 
-      const responseText = await generateVisionChatResponse({
-        imageDataUrl,
-        text: input.trim(),
-        messages: apiMessages
-      });
+        const responseText = await generateVisionChatResponse({
+          imageDataUrl,
+          text: userMessage.content,
+          messages: messages.map(msg => ({ role: msg.role, content: msg.content || '[Media]' }))
+        });
 
-      setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
-    } else {
-      // Text-only or document — use DeepSeek
-      let textToSend = input.trim();
-      if (selectedFile) {
-        textToSend = `[Melampirkan file: ${selectedFile.name}]\n${textToSend}`;
+        // Animate fallback text char by char like typing
+        for (let i = 1; i <= responseText.length; i++) {
+          const slicedText = responseText.slice(0, i);
+          setMessages(prev => {
+            const newMsgs = [...prev];
+            const lastIdx = newMsgs.length - 1;
+            if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+              newMsgs[lastIdx] = {
+                ...newMsgs[lastIdx],
+                content: slicedText,
+                isTyping: true
+              };
+            }
+            return newMsgs;
+          });
+          await new Promise(r => setTimeout(r, 12));
+        }
+      } else {
+        // Text-only or document — use streaming DeepSeek
+        let textToSend = userMessage.content;
+        if (selectedFile) {
+          textToSend = `[Melampirkan file: ${selectedFile.name}]\n${textToSend}`;
+        }
+
+        const apiMessages = updatedHistory
+          .filter(m => m.content && m.content.trim())
+          .map(m => ({ role: m.role, content: m.content }));
+        const firstUserIdx = apiMessages.findIndex(m => m.role === 'user');
+        const validMessages = firstUserIdx !== -1 ? apiMessages.slice(firstUserIdx) : apiMessages;
+
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            message: textToSend,
+            messages: validMessages,
+            stream: true
+          })
+        });
+
+        let accumulatedText = '';
+        const contentType = res.headers.get('content-type') || '';
+
+        if (res.ok && res.body && (contentType.includes('text/event-stream') || contentType.includes('event-stream'))) {
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder();
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop() || '';
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || trimmed.startsWith(':')) continue;
+              if (trimmed === 'data: [DONE]') break;
+              if (trimmed.startsWith('data: ')) {
+                const jsonStr = trimmed.slice(6);
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const content = parsed.choices?.[0]?.delta?.content || '';
+                  if (content) {
+                    accumulatedText += content;
+                    setMessages(prev => {
+                      const newMsgs = [...prev];
+                      const lastIdx = newMsgs.length - 1;
+                      if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+                        newMsgs[lastIdx] = {
+                          ...newMsgs[lastIdx],
+                          content: accumulatedText,
+                          isTyping: true
+                        };
+                      }
+                      return newMsgs;
+                    });
+                  }
+                } catch {
+                  // Ignore partial JSON chunks
+                }
+              }
+            }
+          }
+        }
+
+        // Fallback typewriter if stream failed or empty
+        if (!accumulatedText) {
+          let fullText = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+          try {
+            const data = await res.json();
+            if (data.reply) fullText = data.reply;
+            else if (data.error) fullText = typeof data.error === 'string' ? data.error : 'Terjadi kesalahan pada server API.';
+          } catch {
+            if (!res.ok) fullText = 'Maaf, koneksi terputus. Silakan coba lagi.';
+          }
+
+          for (let i = 1; i <= fullText.length; i++) {
+            const slicedText = fullText.slice(0, i);
+            setMessages(prev => {
+              const newMsgs = [...prev];
+              const lastIdx = newMsgs.length - 1;
+              if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+                newMsgs[lastIdx] = {
+                  ...newMsgs[lastIdx],
+                  content: slicedText,
+                  isTyping: true
+                };
+              }
+              return newMsgs;
+            });
+            await new Promise(r => setTimeout(r, 12));
+          }
+        }
       }
-
-      const finalMessages = apiMessages.concat({ role: 'user', content: textToSend });
-      const responseText = await generateChatResponse(finalMessages);
-
-      setMessages(prev => [...prev, { role: 'assistant', content: responseText }]);
+    } catch (err) {
+      console.error('Chat page submit error:', err);
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        const lastIdx = newMsgs.length - 1;
+        if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+          newMsgs[lastIdx] = {
+            ...newMsgs[lastIdx],
+            content: 'Maaf, koneksi terputus. Silakan coba lagi.',
+            isTyping: false
+          };
+        }
+        return newMsgs;
+      });
+    } finally {
+      // Clear typing indicator status
+      setMessages(prev => {
+        const newMsgs = [...prev];
+        const lastIdx = newMsgs.length - 1;
+        if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
+          newMsgs[lastIdx] = {
+            ...newMsgs[lastIdx],
+            isTyping: false
+          };
+        }
+        return newMsgs;
+      });
+      setSelectedFile(null);
+      setIsLoading(false);
     }
-
-    setSelectedFile(null);
-    setIsLoading(false);
   };
 
   return (
@@ -268,36 +401,33 @@ const ChatbotPage = () => {
                 )}
 
                 {/* Render Text Content */}
-                {msg.content && (() => {
-                  const hasRekomendasi = /REKOMENDASI PSIKOLOG:/i.test(msg.content);
-                  let cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
-                  cleanText = cleanText.replace(/^\s*\*{2}\s*$/gm, '');
-                  return (
-                    <>
-                      <div className="markdown-content">
-                        <ReactMarkdown>{cleanText}</ReactMarkdown>
-                      </div>
-                      {hasRekomendasi && <PsikologFinder />}
-                    </>
-                  );
-                })()}
+                {msg.role === 'assistant' && !msg.content && msg.isTyping ? (
+                  <div className="flex items-center gap-1.5 py-2 px-1">
+                    <span className="w-2.5 h-2.5 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                    <span className="w-2.5 h-2.5 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></span>
+                    <span className="w-2.5 h-2.5 bg-primary-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                  </div>
+                ) : (
+                  msg.content && (() => {
+                    const hasRekomendasi = /REKOMENDASI PSIKOLOG:/i.test(msg.content);
+                    let cleanText = hasRekomendasi ? cleanPsikologText(msg.content) : msg.content;
+                    cleanText = cleanText.replace(/^\s*\*{2}\s*$/gm, '');
+                    return (
+                      <>
+                        <div className="markdown-content">
+                          <ReactMarkdown>{cleanText}</ReactMarkdown>
+                          {msg.isTyping && (
+                            <span className="inline-block w-2.5 h-4 ml-1 bg-primary-500 rounded-xs animate-pulse align-middle" />
+                          )}
+                        </div>
+                        {hasRekomendasi && <PsikologFinder />}
+                      </>
+                    );
+                  })()
+                )}
               </div>
             </motion.div>
           ))}
-          {isLoading && (
-            <motion.div 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex gap-3 max-w-[85%]"
-            >
-              <div className="w-8 h-8 md:w-10 md:h-10 shrink-0 rounded-full flex items-center justify-center bg-primary-100 text-primary-600 border border-primary-200">
-                <Bot size={20} />
-              </div>
-              <div className="p-4 rounded-3xl bg-white border border-gray-100 text-gray-500 rounded-tl-sm shadow-sm flex items-center gap-2">
-                <Loader2 size={18} className="animate-spin text-primary-500" /> Mengetik balasan...
-              </div>
-            </motion.div>
-          )}
           <div ref={messagesEndRef} />
         </div>
       </main>

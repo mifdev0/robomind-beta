@@ -14,6 +14,8 @@
   --color-secondary-500: #f59e0b;
 }
 
+@variant dark (&:where(.dark, .dark *));
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -23,10 +25,20 @@
     font-family: var(--font-outfit);
     color: var(--color-gray-800);
     background-color: var(--color-gray-50);
+    transition: background-color 0.3s, color 0.3s;
+  }
+  
+  html.dark body {
+    color: #e2e8f0;
+    background-color: #0f172a;
   }
   
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-fredoka);
+  }
+
+  html.dark h1, html.dark h2, html.dark h3, html.dark h4, html.dark h5, html.dark h6 {
+    color: #ffffff;
   }
 }
 
@@ -60,3 +72,140 @@
   overflow-x: auto;
   margin: 0.5rem 0;
 }
+
+/* ==========================================
+   GLOBAL DARK MODE COLOR OVERRIDES
+   ========================================== */
+html.dark, html.dark body {
+  color: #cbd5e1 !important;
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-white {
+  background-color: #1e293b !important;
+}
+
+html.dark .bg-gray-50 {
+  background-color: #0f172a !important;
+}
+
+html.dark .bg-gray-100,
+html.dark .bg-slate-100 {
+  background-color: #334155 !important;
+}
+
+html.dark .bg-gray-200,
+html.dark .bg-slate-200 {
+  background-color: #475569 !important;
+}
+
+html.dark .bg-gray-200\/60 {
+  background-color: rgba(51, 65, 85, 0.6) !important;
+}
+
+html.dark .bg-gray-50\/50 {
+  background-color: rgba(15, 23, 42, 0.5) !important;
+}
+
+html.dark .bg-\[\#f0f2f5\] {
+  background-color: #0f172a !important;
+}
+
+/* Text Overrides */
+html.dark .text-black,
+html.dark .text-gray-950,
+html.dark .text-slate-950,
+html.dark .text-gray-900,
+html.dark .text-gray-800,
+html.dark .text-gray-700,
+html.dark .text-slate-800,
+html.dark .text-slate-900,
+html.dark .text-slate-700 {
+  color: #f8fafc !important;
+}
+
+html.dark .text-gray-600,
+html.dark .text-gray-500,
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-gray-400,
+html.dark .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Border Overrides */
+html.dark .border-gray-50,
+html.dark .border-gray-100,
+html.dark .border-gray-150,
+html.dark .border-gray-200,
+html.dark .border-slate-100,
+html.dark .border-slate-200 {
+  border-color: #334155 !important;
+}
+
+/* Hover overrides */
+html.dark .hover\:bg-gray-50:hover,
+html.dark .hover\:bg-gray-100:hover,
+html.dark .hover\:bg-gray-200\/60:hover {
+  background-color: #334155 !important;
+}
+
+/* Shadow adjustments */
+html.dark .shadow-sm,
+html.dark .shadow-md,
+html.dark .shadow-lg,
+html.dark .shadow-xl,
+html.dark .shadow-2xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Form Controls (Inputs, Selects, Textareas) */
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #64748b !important;
+}
+
+/* Dropdowns & Modals */
+html.dark .bg-white\/80 {
+  background-color: rgba(15, 23, 42, 0.8) !important;
+}
+
+/* Special adjustments for community & chat views */
+html.dark .markdown-content p {
+  color: #e2e8f0 !important;
+}
+
+html.dark .markdown-content pre,
+html.dark .markdown-content code {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #f8fafc !important;
+}
+
+html.dark .bg-primary-50 {
+  background-color: rgba(20, 184, 166, 0.1) !important;
+}
+
+html.dark .bg-primary-100 {
+  background-color: rgba(20, 184, 166, 0.15) !important;
+  color: #14b8a6 !important;
+}
+
+html.dark .text-primary-600 {
+  color: #14b8a6 !important;
+}
+
+html.dark .bg-secondary-500 {
+  background-color: #f59e0b !important;
+}
+

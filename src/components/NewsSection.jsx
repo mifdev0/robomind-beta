@@ -91,18 +91,21 @@ const NewsSection = () => {
   ];
 
   return (
-    <section id="berita-terupdate" className="bg-white py-10 sm:py-16 lg:py-24 border-b border-gray-100 w-full relative">
+    <section id="berita-terupdate" className="bg-white dark:bg-slate-900 py-10 sm:py-16 lg:py-24 border-b border-gray-100 dark:border-slate-800 w-full relative transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col sm:flex-row justify-between items-end mb-8 sm:mb-12">
           <div className="max-w-2xl">
-            <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold text-gray-900 font-fredoka uppercase tracking-tight">
-              {i18n.language === 'en' ? 'News & Updates' : 'Berita & Update'}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white font-fredoka uppercase tracking-tight mb-2">
+              ROBO NEWS
             </h2>
-            <p className="mt-2 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-600 font-outfit">
+            <p className="text-xs sm:text-sm md:text-base text-primary-600 dark:text-primary-400 font-bold tracking-wider uppercase mb-3">
+              {i18n.language === 'en' ? 'News & Updates' : 'Berita & Update'}
+            </p>
+            <p className="text-sm sm:text-base md:text-lg text-gray-600 dark:text-gray-300 font-outfit max-w-xl">
               {i18n.language === 'en' ? 'Latest information about technology, new curriculums, and innovations in the global learning world.' : 'Informasi terkini seputar teknologi, kurikulum baru, dan inovasi dalam dunia pembelajaran global.'}
             </p>
           </div>
-          <a href="#" className="hidden sm:inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors mt-4 sm:mt-0 pb-1 border-b-2 border-transparent hover:border-blue-600 font-outfit">
+          <a href="#" className="hidden sm:inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors mt-4 sm:mt-0 pb-1 border-b-2 border-transparent hover:border-blue-600 dark:hover:border-blue-400 font-outfit">
             {i18n.language === 'en' ? 'View All News' : 'Lihat Semua Berita'} <ExternalLink size={14} className="sm:size-[16]" />
           </a>
         </div>
@@ -121,7 +124,7 @@ const NewsSection = () => {
                 href={item.url} 
                 target="_blank" 
                 rel="noopener noreferrer" 
-                className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 group flex flex-col"
+                className="bg-white dark:bg-slate-800 rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 border border-gray-100 dark:border-slate-800 group flex flex-col"
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-gray-100">
                   <img 

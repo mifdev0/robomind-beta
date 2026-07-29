@@ -1,5 +1,6 @@
 import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
+import WhyRoboMind from '../components/WhyRoboMind';
 import GameSlider from '../components/GameSlider';
 import ModuleSection from '../components/ModuleSection';
 import ScreeningPillars from '../components/ScreeningPillars';
@@ -28,6 +29,7 @@ const LandingPage = () => {
       <Navbar />
       <main>
         <Hero />
+        <WhyRoboMind />
         <GameSlider />
         <ModuleSection />
         <ScreeningPillars />

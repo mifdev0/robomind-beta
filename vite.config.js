@@ -57,20 +57,25 @@ export default defineConfig(({ mode }) => {
             req.on('data', chunk => { body += chunk; });
             req.on('end', async () => {
               try {
-                const { message, messages } = JSON.parse(body);
+                const { message, messages, stream } = JSON.parse(body || '{}');
 
                 const apiKey = env.DEEPSEEK_API_KEY || '';
                 if (!apiKey) {
                   res.statusCode = 500;
+                  res.setHeader('Content-Type', 'application/json');
                   res.end(JSON.stringify({ error: 'API key not configured' }));
                   return;
                 }
 
-                let finalMessages;
+                let finalMessages = [];
                 if (messages && Array.isArray(messages)) {
+                  const formatted = messages.filter(m => m && m.role && m.content);
+                  const firstUserIdx = formatted.findIndex(m => m.role === 'user');
+                  const validHistory = firstUserIdx !== -1 ? formatted.slice(firstUserIdx) : formatted;
+
                   finalMessages = [
                     { role: 'system', content: SYSTEM_PROMPT },
-                    ...messages
+                    ...validHistory
                   ];
                 } else if (message && typeof message === 'string') {
                   finalMessages = [
@@ -79,6 +84,7 @@ export default defineConfig(({ mode }) => {
                   ];
                 } else {
                   res.statusCode = 400;
+                  res.setHeader('Content-Type', 'application/json');
                   res.end(JSON.stringify({ error: 'Message or messages required' }));
                   return;
                 }
@@ -93,25 +99,55 @@ export default defineConfig(({ mode }) => {
                     model: 'deepseek-chat',
                     messages: finalMessages,
                     temperature: 0.3,
-                    max_tokens: 500
+                    max_tokens: 500,
+                    stream: !!stream
                   })
                 });
 
-                const data = await response.json();
+                if (stream) {
+                  if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    console.error('DeepSeek error:', data);
+                    res.statusCode = response.status;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ error: data.error?.message || data.error || 'API request failed' }));
+                    return;
+                  }
 
-                if (!response.ok) {
-                  console.error('DeepSeek error:', data);
-                  res.statusCode = response.status;
-                  res.end(JSON.stringify({ error: 'API request failed' }));
-                  return;
+                  res.setHeader('Content-Type', 'text/event-stream');
+                  res.setHeader('Cache-Control', 'no-cache, no-transform');
+                  res.setHeader('Connection', 'keep-alive');
+
+                  const reader = response.body.getReader();
+                  while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    res.write(value);
+                    if (typeof res.flush === 'function') res.flush();
+                  }
+                  res.end();
+                } else {
+                  const data = await response.json().catch(() => ({}));
+                  if (!response.ok) {
+                    console.error('DeepSeek error:', data);
+                    res.statusCode = response.status;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(JSON.stringify({ error: data.error?.message || data.error || 'API request failed' }));
+                    return;
+                  }
+                  const reply = data.choices?.[0]?.message?.content || 'Maaf, saya tidak bisa menjawab pertanyaan itu.';
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ reply }));
                 }
-
-                const reply = data.choices[0]?.message?.content || 'Maaf, saya tidak bisa menjawab pertanyaan itu.';
-                res.end(JSON.stringify({ reply }));
               } catch (err) {
                 console.error('Chat error:', err);
-                res.statusCode = 500;
-                res.end(JSON.stringify({ error: 'Internal server error' }));
+                if (!res.headersSent) {
+                  res.statusCode = 500;
+                  res.setHeader('Content-Type', 'application/json');
+                  res.end(JSON.stringify({ error: 'Internal server error' }));
+                } else {
+                  res.end();
+                }
               }
             });
           });
