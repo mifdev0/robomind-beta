@@ -1164,7 +1164,6 @@
         '/robo-pose': '/robo-pose/index.html',
         '/robo-delivery': '/robo-delivery/index.html',
         '/robo-bros': '/robo-bros/index.html',
-        // Fallbacks for React Native canvas games if embedded on web
         '/screw-spin': '/robo-delivery/index.html',
         '/rogue-soul': '/robo-bros/index.html',
         '/robo-link': '/robo-maze/index.html',
@@ -1180,10 +1179,24 @@
         targetPath = routeMap[route];
       }
 
-      setTimeout(() => {
-        // Change iframe location internally to stay inside GameAppPage iframe
-        window.location.href = targetPath;
-      }, 150);
+      // Check if game modal overlay exists, or create dynamically
+      let gameOverlay = document.getElementById('activeGameOverlayContainer');
+      if (!gameOverlay) {
+        gameOverlay = document.createElement('div');
+        gameOverlay.id = 'activeGameOverlayContainer';
+        gameOverlay.className = 'fixed inset-0 z-50 bg-[#050a16] flex flex-col w-full h-full';
+        document.body.appendChild(gameOverlay);
+      }
+
+      gameOverlay.innerHTML = `
+        <div class="h-10 bg-[#070d1e] border-b border-[#1a2e56] flex items-center justify-between px-3 z-50 flex-shrink-0">
+          <span class="text-xs font-black text-cyan-400">🎮 Game Mode</span>
+          <button onclick="document.getElementById('activeGameOverlayContainer').remove()" class="px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-400 text-xs font-bold hover:bg-red-500 hover:text-white transition-colors">
+            ✕ Tutup Game
+          </button>
+        </div>
+        <iframe src="${targetPath}" class="w-full h-full border-0 flex-1 bg-[#050a16]" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"></iframe>
+      `;
     }
 
     const ROBOT_POSES = [
