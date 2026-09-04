@@ -149,7 +149,7 @@ const Hero = () => {
                     <motion.a 
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
-                      href="/game-dashboard" 
+                      href="/download" 
                       className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:from-primary-600 hover:to-primary-700 shadow-lg shadow-primary-500/30 transition-all cursor-pointer"
                     >
                       {i18n.language === 'en' ? 'Play Now' : 'Mainkan Sekarang'}
