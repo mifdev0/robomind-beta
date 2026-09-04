@@ -25,10 +25,10 @@ const GameAppPage = () => {
 
   if (!user) return null;
 
-  // Build target URL with parent session info
+  // Build target URL with parent session info natively inside beta
   const accessToken = session?.access_token || '';
   const refreshToken = session?.refresh_token || '';
-  const gameAppUrl = `https://robomind-coba.vercel.app?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}&user_id=${user.id}&email=${encodeURIComponent(user.email)}`;
+  const gameAppUrl = `/app-home.html?access_token=${encodeURIComponent(accessToken)}&refresh_token=${encodeURIComponent(refreshToken)}&user_id=${user.id}&email=${encodeURIComponent(user.email)}`;
 
   return (
     <div className="w-screen h-screen h-[100dvh] bg-[#050a16] overflow-hidden m-0 p-0 fixed inset-0 z-50">
