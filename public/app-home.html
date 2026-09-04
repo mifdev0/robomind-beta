@@ -161,29 +161,29 @@
           <!-- Coins -->
           <div class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl bg-[#0a152d]/80 border border-[#1b315b] shadow-sm">
             <span class="text-amber-400 text-xs sm:text-sm">🪙</span>
-            <span class="text-xs font-extrabold text-white val-coins">1.790</span>
+            <span class="text-xs font-extrabold text-white val-coins">0</span>
           </div>
           <!-- Energy -->
           <div class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl bg-[#0a152d]/80 border border-[#1b315b] shadow-sm">
             <span class="text-cyan-400 text-xs sm:text-sm">⚡</span>
-            <span class="text-xs font-extrabold text-white val-energy">85/100</span>
+            <span class="text-xs font-extrabold text-white val-energy">100/100</span>
           </div>
           <!-- Gems -->
           <div class="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-xl bg-[#0a152d]/80 border border-[#1b315b] shadow-sm">
             <span class="text-pink-400 text-xs sm:text-sm">💎</span>
-            <span class="text-xs font-extrabold text-white val-gems">12</span>
+            <span class="text-xs font-extrabold text-white val-gems">0</span>
           </div>
         </div>
 
-        <!-- Progress Hari Ini -->
+        <!-- Progress Hari Ini (Dynamic per Active Child) -->
         <div class="flex items-center justify-between px-3 py-1.5 rounded-xl bg-[#0a152d]/80 border border-[#1b315b]">
           <div class="flex items-center gap-2 flex-1 mr-3">
             <span class="text-[10px] font-bold text-slate-300 whitespace-nowrap">Progress Hari Ini</span>
             <div class="flex-1 h-2 bg-[#050a16] rounded-full overflow-hidden border border-slate-700/50">
-              <div class="h-full bg-gradient-to-r from-emerald-500 to-[#00f0ff] rounded-full w-[70%]"></div>
+              <div id="homeDailyProgressBar" class="h-full bg-gradient-to-r from-emerald-500 to-[#00f0ff] rounded-full transition-all duration-500" style="width: 0%;"></div>
             </div>
           </div>
-          <span class="text-[10px] font-extrabold text-emerald-400 whitespace-nowrap">+120 XP ⭐</span>
+          <span id="homeDailyXpText" class="text-[10px] font-extrabold text-emerald-400 whitespace-nowrap">+0 XP ⭐</span>
         </div>
       </div>
 
@@ -649,39 +649,58 @@
     <!-- TAB 3: PROFILE & MULTI-USER (CHILDREN) SETTINGS                          -->
     <!-- ======================================================================= -->
     <section id="tab-profile" class="tab-content hidden flex-1 flex flex-col h-full w-full overflow-y-auto pr-1 pb-4">
-      <div class="flex items-center justify-between mb-3 pt-1">
-        <h2 class="text-base sm:text-lg font-black text-white">Profil Penjelajah 👤</h2>
+      <div class="flex items-center justify-between mb-2.5 pt-1 flex-shrink-0">
+        <h2 class="text-base sm:text-lg font-black text-white">Profil & Akun 👤</h2>
         <button onclick="switchTab('home')" class="px-3 py-1 rounded-xl bg-[#0d1b33] border border-[#1a2e56] text-xs font-bold text-cyan-400 hover:text-white transition-colors">
           ← Home
         </button>
       </div>
 
-      <!-- Active Child Card -->
-      <div class="p-4 rounded-2xl bg-[#0d1b33] border border-[#1a2e56] flex items-center justify-between mb-3 shadow-md">
-        <div class="flex items-center gap-3">
-          <div class="w-13 h-13 rounded-full border-2 border-cyan-400 overflow-hidden bg-slate-800 flex-shrink-0">
-            <img id="activeChildAvatarImg" src="robomind_robot_avatar.png?v=3" class="w-full h-full object-cover" />
+      <!-- Parent Google Account Card (Active Login Status) -->
+      <div class="p-3 rounded-2xl bg-gradient-to-r from-[#0d2249] to-[#0b1c3c] border border-cyan-500/30 flex items-center justify-between mb-2.5 shadow-md">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full border border-cyan-400 overflow-hidden bg-slate-800 flex-shrink-0 flex items-center justify-center text-sm shadow-inner">
+            <span id="parentUserAvatar">👤</span>
           </div>
-          <div>
-            <span id="activeChildLevelBadge" class="text-[9px] font-black text-cyan-400 uppercase tracking-wider">Level 12 • Junior Explorer</span>
-            <h3 id="activeChildNameText" class="text-sm sm:text-base font-black text-white">Aira Salsabila</h3>
-            <p id="activeChildStatsText" class="text-[10px] text-slate-400">⚡ 1,420 XP • 🪙 1,790 Koin</p>
+          <div class="min-w-0 truncate">
+            <div class="flex items-center gap-1.5">
+              <span class="text-[8px] font-extrabold text-cyan-400 uppercase tracking-wider">Akun Orang Tua</span>
+              <span id="parentSyncBadge" class="text-[8px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 font-bold rounded border border-emerald-500/30">Google Terhubung</span>
+            </div>
+            <h4 id="parentUserEmail" class="text-xs font-bold text-white truncate">Tamu (Belum Login)</h4>
           </div>
         </div>
-        <button onclick="openModal('addChildModal')" class="px-2.5 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[10px] font-black hover:bg-cyan-500/30 transition-all flex items-center gap-1">
-          <span class="material-symbols-outlined text-sm">person_add</span> + Anak
+        <button id="parentAuthActionBtn" onclick="openModal('authGuardModal')" class="px-2 py-1 bg-[#0099ff] hover:bg-cyan-400 text-[#050a16] text-[9px] font-black rounded-lg shadow-sm transition-all flex-shrink-0">
+          Ganti Akun
         </button>
       </div>
 
-      <!-- Multi-Child Profile Switcher -->
-      <div class="p-3.5 rounded-2xl bg-[#0d1b33] border border-[#1a2e56] mb-3 shadow-sm">
-        <div class="flex items-center justify-between mb-2.5">
-          <span class="text-xs font-black text-white flex items-center gap-1.5">
-            <span class="material-symbols-outlined text-sm text-cyan-400">switch_account</span> Ganti Profil Anak
-          </span>
-          <span class="text-[10px] text-slate-400 font-bold" id="childCountLabel">1 Profil</span>
+      <!-- Active Child Card (Compact & Proportional) -->
+      <div class="p-3 rounded-2xl bg-[#0d1b33] border border-[#1a2e56] flex items-center justify-between mb-2.5 shadow-md">
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-10 h-10 rounded-full border-2 border-cyan-400 overflow-hidden bg-slate-800 flex-shrink-0">
+            <img id="activeChildAvatarImg" src="robomind_robot_avatar.png?v=3" class="w-full h-full object-cover" />
+          </div>
+          <div class="min-w-0 truncate">
+            <span id="activeChildLevelBadge" class="text-[8px] font-black text-cyan-400 uppercase tracking-wider block truncate">Level 1 • Explorer</span>
+            <h3 id="activeChildNameText" class="text-xs sm:text-sm font-black text-white truncate">Pemain Baru</h3>
+            <p id="activeChildStatsText" class="text-[9px] text-slate-400 truncate">⚡ 0 XP • 🪙 0 Koin</p>
+          </div>
         </div>
-        <div id="childrenProfilesList" class="space-y-2">
+        <button onclick="openModal('addChildModal')" class="px-2 py-1.5 rounded-xl bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 text-[9px] font-black hover:bg-cyan-500/30 transition-all flex items-center gap-1 flex-shrink-0">
+          <span class="material-symbols-outlined text-xs">person_add</span> + Anak
+        </button>
+      </div>
+
+      <!-- Multi-Child Profile Switcher (Clean & Compact) -->
+      <div class="p-3 rounded-2xl bg-[#0d1b33] border border-[#1a2e56] mb-2.5 shadow-sm">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-[11px] font-black text-white flex items-center gap-1">
+            <span class="material-symbols-outlined text-xs text-cyan-400">switch_account</span> Profil Anak
+          </span>
+          <span class="text-[9px] text-slate-400 font-bold" id="childCountLabel">1 Profil</span>
+        </div>
+        <div id="childrenProfilesList" class="space-y-1.5 max-h-[160px] overflow-y-auto pr-0.5">
           <!-- Dynamic Child Profiles injected here -->
         </div>
       </div>
@@ -1033,15 +1052,42 @@
     };
 
     
-    // Clear legacy mock demo keys from local storage on launch
+    // Clear legacy mock demo keys AND all game level progress from local storage on launch
     (function cleanMockStorage() {
-      if (localStorage.getItem('robomind_demo_cleaned_v2') !== 'true') {
+      if (localStorage.getItem('robomind_demo_cleaned_v4') !== 'true') {
+        // Global balances & screentime
         localStorage.removeItem('robomind_total_xp');
         localStorage.removeItem('user_coins_balance');
         localStorage.removeItem('user_gems_balance');
         localStorage.removeItem('robomind_screentime_minutes');
         localStorage.removeItem('robomind_children_profiles');
-        localStorage.setItem('robomind_demo_cleaned_v2', 'true');
+        // All game level progress keys
+        localStorage.removeItem('screw_spin_current_level');
+        localStorage.removeItem('screw_spin_coins');
+        localStorage.removeItem('energy_core_current_level');
+        localStorage.removeItem('energy_core_coins');
+        localStorage.removeItem('energy_core_evolution');
+        localStorage.removeItem('robot_circuit_current_level');
+        localStorage.removeItem('robot_circuit_coins');
+        localStorage.removeItem('robot_escape_current_level');
+        localStorage.removeItem('robot_escape_coins');
+        localStorage.removeItem('robo_charge_current_level');
+        localStorage.removeItem('robo_charge_coins');
+        localStorage.removeItem('pick_and_drop_current_level');
+        localStorage.removeItem('pick_and_drop_coins');
+        localStorage.removeItem('pose_master_current_level');
+        localStorage.removeItem('pose_master_coins');
+        localStorage.removeItem('robo_circle_current_level');
+        localStorage.removeItem('robo_circle_coins');
+        localStorage.removeItem('rogue_soul_level_progress');
+        localStorage.removeItem('rogue_soul_coins');
+        localStorage.removeItem('rogue_soul_gems');
+        localStorage.removeItem('rogue_soul_powerups');
+        localStorage.removeItem('robo_link_current_level');
+        localStorage.removeItem('robo_link_lives');
+        localStorage.removeItem('robo_link_last_loss');
+        localStorage.removeItem('robo_link_coins');
+        localStorage.setItem('robomind_demo_cleaned_v4', 'true');
       }
     })();
 
@@ -1116,8 +1162,23 @@
 
       // Fast, smooth redirect
       showToast('🚀 Membuka game...');
+      
+      let targetPath = route;
+      // Convert Expo route string to static HTML path for pure web portal
+      const routeMap = {
+        '/robo-jek': '/robo-jek/index.html',
+        '/robo-maze': '/robo-maze/index.html',
+        '/robo-pose': '/robo-pose/index.html',
+        '/robo-delivery': '/robo-delivery/index.html',
+        '/robo-bros': '/robo-bros/index.html'
+      };
+      
+      if (routeMap[route]) {
+        targetPath = routeMap[route];
+      }
+
       setTimeout(() => {
-        window.location.href = route;
+        window.location.href = targetPath;
       }, 150);
     }
 
@@ -1338,22 +1399,23 @@
 
     
     // =========================================================================
-    // SCREEN TIME TRACKER CONTROLLER
+    // SCREEN TIME TRACKER CONTROLLER (PER ACTIVE CHILD)
     // =========================================================================
-    let screenTimeUsed = parseInt(localStorage.getItem('robomind_screentime_minutes') || '0');
-    let screenTimeLimit = parseInt(localStorage.getItem('robomind_screentime_limit') || '60');
-
     function updateScreenTimeHUD() {
+      const child = getActiveChild();
+      const used = child ? (child.screentime_used || 0) : 0;
+      const limit = child ? (child.screentime_limit || 60) : 60;
+
       const usedEl = document.getElementById('screenTimeUsedText');
       const barEl = document.getElementById('screenTimeBar');
       const remainEl = document.getElementById('screenTimeRemainingText');
 
-      if (usedEl) usedEl.textContent = `${screenTimeUsed} / ${screenTimeLimit} Menit`;
+      if (usedEl) usedEl.textContent = `${used} / ${limit} Menit`;
       
-      const pct = Math.min(100, Math.round((screenTimeUsed / screenTimeLimit) * 100));
+      const pct = Math.min(100, Math.round((used / limit) * 100));
       if (barEl) barEl.style.width = `${pct}%`;
 
-      const remaining = Math.max(0, screenTimeLimit - screenTimeUsed);
+      const remaining = Math.max(0, limit - used);
       if (remainEl) {
         if (remaining > 0) {
           remainEl.textContent = `Sisa Waktu Aman: ${remaining} Menit`;
@@ -1363,13 +1425,43 @@
           remainEl.className = 'text-red-400 font-black animate-pulse';
         }
       }
+
+      // Update Home Stage Daily Progress bar & XP
+      const homeBar = document.getElementById('homeDailyProgressBar');
+      const homeXp = document.getElementById('homeDailyXpText');
+      if (homeBar && child) {
+        const xpProgress = Math.min(100, Math.round(((child.total_xp || 0) % 500) / 5));
+        homeBar.style.width = `${xpProgress}%`;
+      }
+      if (homeXp && child) {
+        homeXp.textContent = `+${child.total_xp || 0} XP ⭐`;
+      }
     }
 
-    // Auto-increment screentime counter every 60 seconds of active usage
+    // Auto-increment screentime counter every 60 seconds for the active child (capped at limit)
     setInterval(() => {
-      screenTimeUsed++;
-      localStorage.setItem('robomind_screentime_minutes', screenTimeUsed.toString());
-      updateScreenTimeHUD();
+      const child = getActiveChild();
+      if (child) {
+        const limit = child.screentime_limit || 60;
+        const current = child.screentime_used || 0;
+        
+        if (current < limit) {
+          child.screentime_used = current + 1;
+          const cacheKey = currentUser ? `robomind_children_${currentUser.id}` : 'robomind_children_profiles';
+          localStorage.setItem(cacheKey, JSON.stringify(userChildrenList));
+          updateScreenTimeHUD();
+
+          // Sync to Supabase if connected
+          if (supabaseClient && currentUser && child.id && !child.id.startsWith('child-default')) {
+            supabaseClient
+              .from('children')
+              .update({ daily_screentime_minutes: child.screentime_used, updated_at: new Date().toISOString() })
+              .eq('id', child.id)
+              .then(() => {})
+              .catch(() => {});
+          }
+        }
+      }
     }, 60000);
 
     
@@ -1430,7 +1522,6 @@
           currentUser = session.user;
           onUserAuthenticated(session.user);
         } else {
-          // If launched inside iframe with parent session or guest mode, don't show login modal
           const isGuest = localStorage.getItem('robomind_guest_mode') === 'true';
           if (!isGuest && !urlUserId) {
             openModal('authGuardModal');
@@ -1440,6 +1531,7 @@
         }
       } catch (e) {
         console.warn("Auth check fast fallback:", e);
+        // Fallback to guest mode seamlessly if network is slow/offline
         if (!localStorage.getItem('robomind_active_child_id')) {
           localStorage.setItem('robomind_guest_mode', 'true');
         }
@@ -1448,15 +1540,19 @@
 
     async function onUserAuthenticated(user) {
       closeModal('authGuardModal');
+      currentUser = user;
       localStorage.removeItem('robomind_guest_mode');
       
-      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Aira Salsabila';
+      const userName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'Orang Tua';
       const userEl = document.querySelector('h1.font-extrabold');
       if (userEl) {
         userEl.innerHTML = `Halo, ${userName.split(' ')[0]}! <span class="text-xs">👋</span>`;
       }
 
-      showToast(`👋 Selamat datang kembali, ${userName.split(' ')[0]}!`);
+      showToast(`👋 Masuk sebagai: ${userName.split(' ')[0]}`);
+      
+      // Reload children profiles specific to this authenticated parent account
+      await loadChildrenProfiles();
     }
 
     async function loginWithGoogle() {
@@ -1598,26 +1694,74 @@
             .order('created_at', { ascending: true });
 
           if (data && data.length > 0) {
-            userChildrenList = data.map(c => ({
-              id: c.id,
-              name: c.name || 'Anak',
-              age: c.age || 7,
-              avatar: c.avatar_url || 'robomind_robot_avatar.png',
-              level: c.level || 1,
-              total_xp: c.total_xp || 0,
-              coins: c.coins || 100,
-              screentime_used: c.daily_screentime_minutes || 0,
-              screentime_limit: c.screentime_limit_minutes || 60
-            }));
+            const cacheKey = `robomind_children_${currentUser.id}`;
+            const localSaved = JSON.parse(localStorage.getItem(cacheKey) || '[]');
+            const todayStr = new Date().toISOString().split("T")[0];
+
+            userChildrenList = data.map(c => {
+              const localMatch = localSaved.find(l => l.id === c.id);
+              const lastUpdateDate = c.updated_at ? new Date(c.updated_at).toISOString().split("T")[0] : todayStr;
+              
+              let screentimeVal = c.daily_screentime_minutes || 0;
+              // Reset if last update was a previous date
+              if (lastUpdateDate !== todayStr) {
+                screentimeVal = 0;
+              } else if (localMatch) {
+                screentimeVal = Math.max(screentimeVal, localMatch.screentime_used || 0);
+              }
+
+              return {
+                id: c.id,
+                name: c.name || 'Pemain Baru',
+                age: c.age || 7,
+                avatar: c.avatar_url || 'robomind_robot_avatar.png',
+                level: c.level || 1,
+                total_xp: c.total_xp || 0,
+                coins: c.coins || 0,
+                screentime_used: Math.min(c.screentime_limit_minutes || 60, screentimeVal),
+                screentime_limit: c.screentime_limit_minutes || 60
+              };
+            });
+            localStorage.setItem(cacheKey, JSON.stringify(userChildrenList));
+          } else {
+            // New parent account with no children yet in DB
+            userChildrenList = [
+              {
+                id: 'child-' + currentUser.id.substring(0, 8),
+                name: 'Pemain Baru',
+                age: 7,
+                avatar: 'robomind_robot_avatar.png',
+                level: 1,
+                total_xp: 0,
+                coins: 0,
+                screentime_used: 0,
+                screentime_limit: 60
+              }
+            ];
           }
         } catch (e) {
           console.warn("Could not load children from Supabase:", e);
         }
       } else {
-        // Load from local storage
-        const saved = localStorage.getItem('robomind_children_profiles');
+        // Guest mode or offline cache
+        const cacheKey = currentUser ? `robomind_children_${currentUser.id}` : 'robomind_children_profiles';
+        const saved = localStorage.getItem(cacheKey);
         if (saved) {
           try { userChildrenList = JSON.parse(saved); } catch (e) {}
+        } else {
+          userChildrenList = [
+            {
+              id: 'child-default',
+              name: 'Pemain Baru',
+              age: 7,
+              avatar: 'robomind_robot_avatar.png',
+              level: 1,
+              total_xp: 0,
+              coins: 0,
+              screentime_used: 0,
+              screentime_limit: 60
+            }
+          ];
         }
       }
 
@@ -1625,7 +1769,9 @@
       const activeId = localStorage.getItem('robomind_active_child_id');
       if (activeId) {
         const foundIdx = userChildrenList.findIndex(c => c.id === activeId);
-        if (foundIdx >= 0) activeChildIndex = foundIdx;
+        activeChildIndex = foundIdx >= 0 ? foundIdx : 0;
+      } else {
+        activeChildIndex = 0;
       }
 
       renderChildrenListUI();
@@ -1688,9 +1834,40 @@
       const avatarImg = document.getElementById('activeChildAvatarImg');
 
       if (nameText) nameText.innerText = child.name;
-      if (badgeText) badgeText.innerText = `Level ${child.level} • Junior Explorer`;
+      if (badgeText) badgeText.innerText = `Level ${child.level} • Explorer`;
       if (statsText) statsText.innerText = `⚡ ${child.total_xp} XP • 🪙 ${child.coins} Koin`;
       if (avatarImg) avatarImg.src = child.avatar;
+
+      // Update Parent Account Badge in Profile Tab
+      const parentEmailEl = document.getElementById('parentUserEmail');
+      const parentAvatarEl = document.getElementById('parentUserAvatar');
+      const parentSyncEl = document.getElementById('parentSyncBadge');
+      const parentAuthBtn = document.getElementById('parentAuthActionBtn');
+
+      if (currentUser) {
+        if (parentEmailEl) parentEmailEl.innerText = currentUser.email || 'Akun Google Terhubung';
+        if (parentSyncEl) {
+          parentSyncEl.innerText = 'Google Terhubung ✓';
+          parentSyncEl.className = 'text-[8px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-400 font-bold rounded border border-emerald-500/30';
+        }
+        if (parentAvatarEl) {
+          const avatarUrl = currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture;
+          if (avatarUrl) {
+            parentAvatarEl.innerHTML = `<img src="${avatarUrl}" class="w-full h-full object-cover rounded-full" />`;
+          } else {
+            parentAvatarEl.innerText = '👤';
+          }
+        }
+        if (parentAuthBtn) parentAuthBtn.innerText = 'Ganti Akun';
+      } else {
+        if (parentEmailEl) parentEmailEl.innerText = 'Mode Tamu (Belum Login)';
+        if (parentSyncEl) {
+          parentSyncEl.innerText = 'Belum Terhubung';
+          parentSyncEl.className = 'text-[8px] px-1.5 py-0.2 bg-amber-500/20 text-amber-400 font-bold rounded border border-amber-500/30';
+        }
+        if (parentAvatarEl) parentAvatarEl.innerText = '👤';
+        if (parentAuthBtn) parentAuthBtn.innerText = 'Login Google';
+      }
 
       // Update Screen Time HUD
       updateScreenTimeHUD();
@@ -1715,7 +1892,7 @@
         avatar: selectedAvatar,
         level: 1,
         total_xp: 0,
-        coins: 100,
+        coins: 0,
         screentime_used: 0,
         screentime_limit: 60
       };
@@ -1730,7 +1907,7 @@
               name: name,
               level: 1,
               total_xp: 0,
-              coins: 100,
+              coins: 0,
               daily_screentime_minutes: 0,
               screentime_limit_minutes: 60
             })
@@ -1746,7 +1923,8 @@
       }
 
       userChildrenList.push(newChildObj);
-      localStorage.setItem('robomind_children_profiles', JSON.stringify(userChildrenList));
+      const cacheKey = currentUser ? `robomind_children_${currentUser.id}` : 'robomind_children_profiles';
+      localStorage.setItem(cacheKey, JSON.stringify(userChildrenList));
       activeChildIndex = userChildrenList.length - 1;
       localStorage.setItem('robomind_active_child_id', newChildObj.id);
 
@@ -1761,9 +1939,12 @@
       if (supabaseClient) {
         try { await supabaseClient.auth.signOut(); } catch (e) {}
       }
+      // Clean local storage cache for old user
       localStorage.removeItem('robomind_guest_mode');
+      localStorage.removeItem('robomind_active_child_id');
+      localStorage.removeItem('robomind_children_profiles');
       showToast('👋 Anda telah keluar dari akun');
-      setTimeout(() => window.location.reload(), 800);
+      setTimeout(() => window.location.reload(), 600);
     }
 
     document.addEventListener('DOMContentLoaded', () => {

@@ -1162,8 +1162,23 @@
 
       // Fast, smooth redirect
       showToast('🚀 Membuka game...');
+      
+      let targetPath = route;
+      // Convert Expo route string to static HTML path for pure web portal
+      const routeMap = {
+        '/robo-jek': '/robo-jek/index.html',
+        '/robo-maze': '/robo-maze/index.html',
+        '/robo-pose': '/robo-pose/index.html',
+        '/robo-delivery': '/robo-delivery/index.html',
+        '/robo-bros': '/robo-bros/index.html'
+      };
+      
+      if (routeMap[route]) {
+        targetPath = routeMap[route];
+      }
+
       setTimeout(() => {
-        window.location.href = route;
+        window.location.href = targetPath;
       }, 150);
     }
 
