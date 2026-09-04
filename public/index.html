@@ -1171,12 +1171,7 @@
       }
 
       setTimeout(() => {
-        try {
-          if (window.top && window.top !== window) {
-            window.top.location.href = targetPath;
-            return;
-          }
-        } catch (e) {}
+        // Change iframe location internally to stay inside GameAppPage iframe
         window.location.href = targetPath;
       }, 150);
     }
