@@ -9,6 +9,8 @@ import CommunityPage from './pages/CommunityPage';
 import TreatmentPage from './pages/TreatmentPage';
 import ResearchPage from './pages/ResearchPage';
 import InsightPage from './pages/InsightPage';
+import DashboardPage from './pages/DashboardPage';
+import GameAppPage from './pages/GameAppPage';
 import RobotCursor from './components/RobotCursor';
 
 function App() {
@@ -17,6 +19,9 @@ function App() {
       <RobotCursor />
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/play" element={<GameAppPage />} />
+        <Route path="/game-dashboard" element={<GameAppPage />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
         <Route path="/chatbot" element={<ChatbotPage />} />
         <Route path="/screening" element={<ScreeningPage />} />
         <Route path="/games" element={<FeaturesPage />} />

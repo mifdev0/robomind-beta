@@ -4,7 +4,6 @@ import WhyRoboMind from '../components/WhyRoboMind';
 import GameSlider from '../components/GameSlider';
 import ModuleSection from '../components/ModuleSection';
 import ScreeningPillars from '../components/ScreeningPillars';
-import ParentDashboard from '../components/ParentDashboard';
 import Pricing from '../components/Pricing';
 import NewsSection from '../components/NewsSection';
 import Footer from '../components/Footer';
@@ -41,10 +40,6 @@ const LandingPage = () => {
         <ModuleSection />
         
         <ScreeningPillars />
-        
-        <ScrollReveal animation="fade-left" duration={0.8} threshold={0.15}>
-          <ParentDashboard />
-        </ScrollReveal>
         
         <Pricing />
         
