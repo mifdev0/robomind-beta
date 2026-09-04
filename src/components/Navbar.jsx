@@ -161,6 +161,11 @@ const Navbar = () => {
 
             <a href="/#berlangganan" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">{t('navbar.pricing')}</a>
             
+            {/* Play Game Link */}
+            <Link to="/play" className="text-primary-600 dark:text-primary-400 font-bold hover:text-primary-700 transition-colors flex items-center gap-1">
+              🎮 {i18n.language === 'en' ? 'Play Game' : 'Mainkan Game'}
+            </Link>
+
             {/* Community link next to Subscription */}
             <Link to="/community" className="text-gray-600 dark:text-gray-300 hover:text-primary-600 dark:hover:text-primary-400 font-medium transition-colors">
               {t('navbar.community')}
