@@ -151,9 +151,9 @@ const Navbar = () => {
                     <a href="/#skrining-awal" className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-250 hover:bg-primary-50 dark:hover:bg-slate-700/50 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium">
                       {t('navbar.screening')}
                     </a>
-                    <a href="/#progress-anak" className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-250 hover:bg-primary-50 dark:hover:bg-slate-700/50 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium">
+                    <Link to="/dashboard" className="block px-4 py-2.5 text-sm text-gray-700 dark:text-gray-250 hover:bg-primary-50 dark:hover:bg-slate-700/50 hover:text-primary-600 dark:hover:text-primary-400 transition-colors font-medium">
                       {t('navbar.progress')}
-                    </a>
+                    </Link>
                   </motion.div>
                 )}
               </AnimatePresence>
@@ -233,12 +233,12 @@ const Navbar = () => {
 
                   {/* Settings Link inside dropdown */}
                   <div className="text-xs">
-                    <a 
-                      href="/#progress-anak" 
+                    <Link 
+                      to="/dashboard" 
                       className="block text-gray-600 dark:text-gray-300 hover:text-primary-500 font-medium py-1"
                     >
-                      ⚙️ {i18n.language === 'en' ? 'Settings & Dashboard' : 'Pengaturan & Dashboard'}
-                    </a>
+                      ⚙️ {i18n.language === 'en' ? 'Parent Dashboard' : 'Dashboard Orang Tua'}
+                    </Link>
                   </div>
 
                   {user ? (
@@ -303,7 +303,7 @@ const Navbar = () => {
                 <div className="pl-4 space-y-1 border-l border-gray-200 dark:border-slate-700 ml-4">
                   <a href="/#fitur-game" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800">{t('navbar.features')}</a>
                   <a href="/#skrining-awal" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800">{t('navbar.screening')}</a>
-                  <a href="/#progress-anak" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800">{t('navbar.progress')}</a>
+                  <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block px-3 py-2 rounded-md text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-slate-800">{t('navbar.progress')}</Link>
                 </div>
               )}
             </div>
@@ -354,9 +354,9 @@ const Navbar = () => {
                   </button>
                 </div>
 
-                <a href="/#progress-anak" onClick={() => setIsOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 hover:text-primary-500 font-medium py-1">
-                  ⚙️ {i18n.language === 'en' ? 'Settings & Dashboard' : 'Pengaturan & Dashboard'}
-                </a>
+                <Link to="/dashboard" onClick={() => setIsOpen(false)} className="block text-sm text-gray-600 dark:text-gray-300 hover:text-primary-500 font-medium py-1">
+                  ⚙️ {i18n.language === 'en' ? 'Parent Dashboard' : 'Dashboard Orang Tua'}
+                </Link>
               </div>
 
               {user && (
