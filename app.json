@@ -21,6 +21,11 @@
     },
     "web": {
       "favicon": "./public/robomind_robot_avatar.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86b297f7-1329-4877-99bf-7c2fb26193b9"
+      }
     }
   }
 }
