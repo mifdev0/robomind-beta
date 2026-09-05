@@ -208,23 +208,13 @@ const ParentDashboard = () => {
             skillData = userSkill;
           }
 
-          if (skillData) {
-            setSkills({
-              logic: Number(skillData.logic_score) || 0,
-              creativity: Number(skillData.creativity_score) || 0,
-              literacy: Number(skillData.literacy_score) || 0,
-              focus: Number(skillData.focus_score) || 0,
-              moral: Number(skillData.moral_score) || 0
-            });
-          }
-
           // 3. Fetch recent game sessions for active child
           let { data: sessions } = await supabase
             .from('game_sessions')
             .select('*')
             .eq('child_id', currentC.id)
             .order('completed_at', { ascending: false })
-            .limit(5);
+            .limit(10);
 
           if ((!sessions || sessions.length === 0) && user) {
             const { data: userSessions } = await supabase
@@ -232,13 +222,44 @@ const ParentDashboard = () => {
               .select('*')
               .eq('user_id', user.id)
               .order('completed_at', { ascending: false })
-              .limit(5);
+              .limit(10);
             sessions = userSessions;
           }
 
           if (sessions && sessions.length > 0) {
             setRecentSessions(sessions);
           }
+
+          // Compute skills with base default (50%) + increments from played sessions if skillData is fresh
+          let computedLogic = skillData ? Number(skillData.logic_score) || 0 : 50;
+          let computedCreativity = skillData ? Number(skillData.creativity_score) || 0 : 50;
+          let computedLiteracy = skillData ? Number(skillData.literacy_score) || 0 : 50;
+          let computedFocus = skillData ? Number(skillData.focus_score) || 0 : 50;
+          let computedMoral = skillData ? Number(skillData.moral_score) || 0 : 50;
+
+          // If scores in DB are 0 or no row existed, compute baseline from session count
+          if (sessions && sessions.length > 0 && (computedLogic === 0 && computedFocus === 0)) {
+            computedLogic = 50; computedCreativity = 50; computedLiteracy = 50; computedFocus = 50; computedMoral = 50;
+            sessions.forEach(s => {
+              const cat = (s.category || '').toLowerCase();
+              const gId = (s.game_id || s.game_title || '').toLowerCase();
+              if (cat.includes('fokus') || gId.includes('screw') || gId.includes('rogue')) computedFocus = Math.min(100, computedFocus + 5);
+              else if (cat.includes('literasi') || gId.includes('link')) computedLiteracy = Math.min(100, computedLiteracy + 5);
+              else if (cat.includes('moral') || gId.includes('jek')) computedMoral = Math.min(100, computedMoral + 5);
+              else if (cat.includes('kognitif') || gId.includes('escape') || gId.includes('circuit')) {
+                computedLogic = Math.min(100, computedLogic + 5);
+                computedCreativity = Math.min(100, computedCreativity + 3);
+              }
+            });
+          }
+
+          setSkills({
+            logic: computedLogic || 50,
+            creativity: computedCreativity || 50,
+            literacy: computedLiteracy || 50,
+            focus: computedFocus || 50,
+            moral: computedMoral || 50
+          });
         }
       } catch (err) {
         console.warn('Using local demo progress data:', err);
@@ -441,17 +462,53 @@ const ParentDashboard = () => {
               </div>
             </div>
 
-            {/* Recent Played Games */}
+            {/* Recent Played Games with Impacted PFC Pillars */}
             <div>
-              <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">Aktivitas Terakhir ({activeChild.name})</h4>
-              <div className="space-y-1.5">
+              <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
+                Aktivitas & Dampak Kognitif Terakhir ({activeChild.name})
+              </h4>
+              <div className="space-y-2">
                 {recentSessions.length > 0 ? (
-                  recentSessions.map((s, idx) => (
-                    <div key={idx} className="flex items-center justify-between py-1.5 px-2.5 rounded-lg bg-gray-50 dark:bg-slate-900/40 text-xs">
-                      <span className="font-bold text-gray-800 dark:text-gray-200">{s.game_title}</span>
-                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">+{s.xp_earned} XP</span>
-                    </div>
-                  ))
+                  recentSessions.map((s, idx) => {
+                    const title = s.game_title || s.game_id || 'Robo Game';
+                    const cat = (s.category || '').toLowerCase();
+                    const gId = (s.game_id || title).toLowerCase();
+                    
+                    let pfcBadge = '🧠 Working Memory +5%';
+                    let badgeColor = 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800';
+
+                    if (cat.includes('fokus') || gId.includes('screw') || gId.includes('rogue') || gId.includes('circle')) {
+                      pfcBadge = '🎯 Inhibitory Control (Fokus) +5%';
+                      badgeColor = 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
+                    } else if (cat.includes('literasi') || gId.includes('link')) {
+                      pfcBadge = '📚 Language & Literacy +5%';
+                      badgeColor = 'bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-800';
+                    } else if (cat.includes('moral') || gId.includes('jek') || gId.includes('drop')) {
+                      pfcBadge = '🤝 Moral & Empathy +5%';
+                      badgeColor = 'bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800';
+                    } else if (gId.includes('escape') || gId.includes('charge') || gId.includes('maze')) {
+                      pfcBadge = '🔄 Cognitive Flexibility +5%';
+                      badgeColor = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
+                    }
+
+                    return (
+                      <div key={idx} className="p-2.5 rounded-xl bg-gray-50 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
+                        <div className="flex flex-col gap-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="font-extrabold text-gray-900 dark:text-white">{title}</span>
+                            <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Level {s.level_reached || 1}</span>
+                          </div>
+                          <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold border w-max ${badgeColor}`}>
+                            {pfcBadge}
+                          </span>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-black block">+{s.xp_earned || 50} XP</span>
+                          <span className="text-[10px] text-amber-500 font-bold block">🪙 +{s.coins_earned || 20} Koin</span>
+                        </div>
+                      </div>
+                    );
+                  })
                 ) : (
                   <div className="text-center py-4 px-3 rounded-xl bg-gray-50 dark:bg-slate-900/40 border border-dashed border-gray-200 dark:border-slate-700 text-xs text-gray-400">
                     Belum ada sesi bermain hari ini. Mainkan game untuk mencatat kemajuan!
