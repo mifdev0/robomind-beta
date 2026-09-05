@@ -470,10 +470,18 @@ const ParentDashboard = () => {
 
             {/* Recent Played Games with Impacted PFC Pillars */}
             <div>
-              <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-2">
-                Aktivitas & Dampak Kognitif Terakhir ({activeChild.name})
-              </h4>
-              <div className="space-y-2">
+              <div className="flex items-center justify-between mb-2">
+                <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
+                  Aktivitas Terbaru ({activeChild.name})
+                </h4>
+                {recentSessions.length > 5 && (
+                  <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950 px-2 py-0.5 rounded-md">
+                    Scroll untuk lihat semua ({recentSessions.length})
+                  </span>
+                )}
+              </div>
+
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-slate-700">
                 {recentSessions.length > 0 ? (
                   recentSessions.map((s, idx) => {
                     const title = s.game_title || s.game_id || 'Robo Game';
@@ -484,7 +492,7 @@ const ParentDashboard = () => {
                     let badgeColor = 'bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-300 border-cyan-300 dark:border-cyan-800';
 
                     if (cat.includes('fokus') || gId.includes('screw') || gId.includes('rogue') || gId.includes('circle')) {
-                      pfcBadge = '🎯 Inhibitory Control (Fokus) +5%';
+                      pfcBadge = '🎯 Inhibitory Control +5%';
                       badgeColor = 'bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800';
                     } else if (cat.includes('literasi') || gId.includes('link')) {
                       pfcBadge = '📚 Language & Literacy +5%';
