@@ -577,8 +577,12 @@ const ParentDashboard = () => {
               <Radar key={`${activeChild.id}-${isDark ? 'dark' : 'light'}`} data={chartData} options={chartOptions} />
             </motion.div>
             
-            {/* LAYER 2 & 3: PFC BRAIN PROFILE BADGE & ACTIONABLE AI RECOMMENDATIONS */}
+            {/* LAYER 2 & 3: DYNAMIC PFC BRAIN PROFILE BADGE & ACTIONABLE AI RECOMMENDATIONS */}
             {(() => {
+              // Extract unique game titles played recently
+              const playedGameTitles = Array.from(new Set(recentSessions.map(s => s.game_title || s.game_id || 'Robo Game')));
+              const lastGameTitle = recentSessions.length > 0 ? (recentSessions[0].game_title || recentSessions[0].game_id) : null;
+
               // Calculate dominant PFC strength & brain archetype
               const pfcScores = [
                 { name: 'Working Memory (Logika)', score: skills.logic, key: 'logic', color: 'from-cyan-500 to-blue-500', games: 'Robot Circuit, Energy Core, Robo Link' },
@@ -597,20 +601,29 @@ const ParentDashboard = () => {
 
               if (topPfc.key === 'logic') {
                 archetypeTitle = "🧩 Strategic Logic Thinker";
-                archetypeDesc = "Sangat kuat dalam logika berurutan, Working Memory, dan pemecahan puzzle skematis.";
+                archetypeDesc = `Sangat menonjol dalam logika berurutan, Working Memory, dan pemecahan masalah puzzle.`;
               } else if (topPfc.key === 'focus') {
                 archetypeTitle = "🎯 High-Focus Tactician";
-                archetypeDesc = "Unggul dalam Inhibitory Control (kontrol impuls), ketahanan fokus, dan respons taktis.";
+                archetypeDesc = `Unggul dalam Inhibitory Control (kontrol impuls), ketahanan fokus, dan respons refleks cepat.`;
               } else if (topPfc.key === 'creativity') {
                 archetypeTitle = "🔄 Flexible Adaptor & Creator";
-                archetypeDesc = "Memiliki Fleksibilitas Kognitif tinggi, mampu berpikir cepat saat situasi tantangan berubah.";
+                archetypeDesc = `Memiliki Fleksibilitas Kognitif tinggi, mampu beradaptasi cepat saat tantangan dan aturan berubah.`;
               } else if (topPfc.key === 'moral') {
                 archetypeTitle = "🤝 Empathic Social Leader";
-                archetypeDesc = "Unggul dalam pertimbangan etis, empati sosial, dan pengambilan keputusan bermoral.";
+                archetypeDesc = `Unggul dalam pertimbangan etis, empati sosial, dan pemahaman dampak sosial dari suatu tindakan.`;
               } else if (topPfc.key === 'literacy') {
                 archetypeTitle = "📚 Linguistic Conceptualizer";
-                archetypeDesc = "Kuat dalam pengenalan pola bahasa, memori verbal, dan komunikasi konsep.";
+                archetypeDesc = `Kuat dalam pengenalan pola bahasa, memori verbal, serta penyampaian konsep.`;
               }
+
+              // Dynamic text based on actual played games
+              const playedText = playedGameTitles.length > 0
+                ? `Game yang aktif dimainkan: ${playedGameTitles.slice(0, 3).join(', ')}.`
+                : 'Belum ada game yang selesai dimainkan hari ini.';
+
+              const lastPlayNote = lastGameTitle
+                ? `Terakhir kali ${activeChild.name} menyelesaikan sesi game ${lastGameTitle}.`
+                : '';
 
               return (
                 <div className="w-full space-y-3 mt-2">
@@ -618,7 +631,7 @@ const ParentDashboard = () => {
                   <div className="p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 border border-cyan-500/30 text-left">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-black uppercase text-cyan-400">Profil Karakter Otak (PFC Profile)</span>
-                      <span className="text-xs font-bold text-amber-400">Skor Tertinggi: {topPfc.score}%</span>
+                      <span className="text-xs font-bold text-amber-400">Skor Utama: {topPfc.score}%</span>
                     </div>
                     <div className="font-extrabold text-sm text-white flex items-center gap-1.5">
                       <span>{archetypeTitle}</span>
@@ -630,14 +643,18 @@ const ParentDashboard = () => {
 
                   {/* Layer 3: Actionable AI Insight */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-gray-200 dark:border-slate-700 text-left text-xs space-y-1.5">
-                    <div className="flex items-center gap-1.5 font-bold text-gray-800 dark:text-gray-200">
-                      <span>💡 <b>Rekomendasi Pendampingan Orang Tua:</b></span>
+                    <div className="flex items-center justify-between font-bold text-gray-800 dark:text-gray-200">
+                      <span>💡 <b>Analisis Pendampingan AI untuk Orang Tua:</b></span>
+                      <span className="text-[9px] text-cyan-600 dark:text-cyan-400 font-normal">Real-Time Adaptif</span>
                     </div>
                     <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
-                      • <b>Kekuatan PFC Utama:</b> <span className="text-emerald-600 dark:text-emerald-400 font-bold">{topPfc.name} ({topPfc.score}%)</span> terasah dengan baik lewat game <i>{topPfc.games}</i>.
+                      • <b>Fokus Permainan:</b> {playedText} {lastPlayNote}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
-                      • <b>Saran Penguatan:</b> Untuk mengasah area <span className="text-cyan-600 dark:text-cyan-400 font-bold">{lowestPfc.name} ({lowestPfc.score}%)</span>, ajak {activeChild.name} lebih sering memainkan mini-game <i>{lowestPfc.games}</i> atau latihan interaksi langsung di rumah.
+                      • <b>Pilar PFC Dominan:</b> Area <span className="text-emerald-600 dark:text-emerald-400 font-bold">{topPfc.name} ({topPfc.score}%)</span> berkembang paling baik.
+                    </p>
+                    <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
+                      • <b>Saran Penguatan:</b> Untuk menyeimbangkan pilar <span className="text-cyan-600 dark:text-cyan-400 font-bold">{lowestPfc.name} ({lowestPfc.score}%)</span>, berikan kesempatan {activeChild.name} mencoba game <i>{lowestPfc.games}</i>.
                     </p>
                   </div>
                 </div>
