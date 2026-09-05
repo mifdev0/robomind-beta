@@ -38,20 +38,27 @@ const Hero = () => {
     },
     {
       id: 1,
+      tag: i18n.language === 'en' ? "INTERACTIVE GAMEPLAY PREVIEW" : "PREVIEW GAMEPLAY INTERAKTIF",
+      title: i18n.language === 'en' ? "Experience RoboMind Action in Real-Time" : "Saksikan Aksi Seru Game RoboMind Secara Langsung",
+      subtitle: i18n.language === 'en' ? "Watch how scientific neurocognitive games engage children while honing focus and logic." : "Tonton bagaimana game neurokognitif berbasis riset melatih fokus, memori, dan logika anak secara interaktif.",
+      video: "/assets/image hero/video hero 2.MOV"
+    },
+    {
+      id: 2,
       tag: i18n.language === 'en' ? "FUTURE EDUCATION PLATFORM" : "PLATFORM EDUKASI MASA DEPAN",
       title: i18n.language === 'en' ? "Hone Children's Cognitive & Logic" : "Asah Potensi Kognitif & Logika Anak",
       subtitle: i18n.language === 'en' ? "Connect your child's game, monitor development metrics in real-time, and get specific recommendations from child psychologists." : "Hubungkan game anak Anda, pantau metrik perkembangannya secara real-time, dan dapatkan rekomendasi spesifik dari psikolog anak.",
       img: "/assets/images/robomind_hero.png"
     },
     {
-      id: 2,
+      id: 3,
       tag: i18n.language === 'en' ? "AI GAME TECHNOLOGY" : "TEKNOLOGI GAME AI",
       title: i18n.language === 'en' ? "Exciting Adventure Full of Challenges" : "Petualangan Seru Penuh Tantangan",
       subtitle: i18n.language === 'en' ? "Play while honing coding logic. Let your little one's imagination fly high without limits." : "Bermain sambil mengasah logika coding. Biarkan imajinasi si kecil terbang tinggi tanpa batas.",
       img: "/assets/images/hero_classroom.png"
     },
     {
-      id: 3,
+      id: 4,
       tag: i18n.language === 'en' ? "REAL-TIME MONITORING" : "PANTUAN REAL-TIME",
       title: i18n.language === 'en' ? "See Development Directly" : "Lihat Perkembangan Secara Langsung",
       subtitle: i18n.language === 'en' ? "Access an exclusive dashboard to track language competence, focus, and problem solving." : "Akses dashboard eksklusif untuk melacak kompetensi bahasa, fokus, dan pemecahan masalah.",
@@ -84,7 +91,18 @@ const Hero = () => {
         {slides.map((slide) => (
           <SwiperSlide key={slide.id} className="w-full h-full">
             <div className="absolute inset-0 w-full h-full overflow-hidden">
-              <img src={slide.img} alt={slide.title} className="w-full h-full object-cover object-center scale-105 animate-slow-zoom" />
+              {slide.video ? (
+                <video
+                  src={slide.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover object-center scale-105"
+                />
+              ) : (
+                <img src={slide.img} alt={slide.title} className="w-full h-full object-cover object-center scale-105 animate-slow-zoom" />
+              )}
               <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-black/35" />
             </div>
 
