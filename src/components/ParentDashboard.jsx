@@ -505,15 +505,22 @@ const ParentDashboard = () => {
                       badgeColor = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
                     }
 
-                    // Format timestamp
+                    // Format timestamp properly converting UTC ISO string to local time
                     let timeFormatted = 'Baru saja';
                     if (s.completed_at || s.created_at) {
                       try {
                         const dateObj = new Date(s.completed_at || s.created_at);
-                        const hours = String(dateObj.getHours()).padStart(2, '0');
-                        const mins = String(dateObj.getMinutes()).padStart(2, '0');
-                        const isToday = new Date().toDateString() === dateObj.toDateString();
-                        timeFormatted = isToday ? `${hours}:${mins}` : `${dateObj.getDate()}/${dateObj.getMonth() + 1} ${hours}:${mins}`;
+                        if (!isNaN(dateObj.getTime())) {
+                          timeFormatted = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
+                          const today = new Date();
+                          const isSameDay = today.getDate() === dateObj.getDate() && 
+                                           today.getMonth() === dateObj.getMonth() && 
+                                           today.getFullYear() === dateObj.getFullYear();
+                          if (!isSameDay) {
+                            const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric' });
+                            timeFormatted = `${dateStr} ${timeFormatted}`;
+                          }
+                        }
                       } catch (e) {}
                     }
 
