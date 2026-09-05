@@ -13,25 +13,18 @@ const Hero = () => {
     subtitle: i18n.language === 'en' 
       ? "Transforming passive screen time into a scientifically calibrated catalyst for Prefrontal Cortex development in children aged 6 to 12." 
       : "Mengubah screen time pasif menjadi katalis terkalibrasi ilmiah untuk perkembangan Prefrontal Cortex pada anak usia 6 hingga 12 tahun.",
-    video: "/robo_adventures_preview.mp4",
-    poster: "/hero-web.png"
+    img: "/hero-web.png"
   };
 
   return (
     <section id="beranda" className="relative w-full h-[85vh] min-h-[580px] sm:h-[70vh] md:h-[60vh] lg:h-[620px] bg-slate-950 overflow-hidden">
-      {/* Background Video Container with Full Cover Rendering */}
+      {/* Background Image Container with Full Cover Rendering */}
       <div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-950">
-        <video
+        <img 
+          src={heroData.img} 
+          alt="RoboMind Hero Banner" 
           className="w-full h-full object-cover object-center"
-          autoPlay
-          muted
-          loop
-          playsInline
-          poster={heroData.poster}
-          aria-label="RoboMind game preview"
-        >
-          <source src={heroData.video} type="video/mp4" />
-        </video>
+        />
         {/* Contrast Overlay for Text Readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-slate-950/35" />
       </div>
