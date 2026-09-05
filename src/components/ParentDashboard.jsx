@@ -270,10 +270,16 @@ const ParentDashboard = () => {
 
     loadParentEcosystem();
 
-    // Subscribe to realtime updates from Supabase
+    // Subscribe to realtime updates from Supabase for sessions, skills, and children
     const channel = supabase
       .channel('realtime_game_progress_web')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'game_sessions' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => {
+        loadParentEcosystem();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'child_skills' }, () => {
+        loadParentEcosystem();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'children' }, () => {
         loadParentEcosystem();
       })
       .subscribe();
