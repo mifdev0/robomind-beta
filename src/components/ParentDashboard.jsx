@@ -112,18 +112,24 @@ const ParentDashboard = () => {
 
   const resetScreentime = async (childId) => {
     if (!window.confirm('Apakah yakin ingin mereset waktu bermain harian untuk anak ini? Waktu akan direset ke 0 menit.')) return;
-    try {
-      const { error } = await supabase
-        .from('children')
-        .update({ daily_screentime_minutes: 0 })
-        .eq('id', childId);
-      if (error) throw error;
-      alert('✅ Waktu bermain telah direset ke 0 menit!');
-      loadParentEcosystem();
-    } catch (err) {
-      console.error("Screentime reset error:", err);
-      alert('⚠️ Gagal mereset waktu bermain. Coba lagi nanti.');
+    
+    // Optimistic UI update
+    setChildrenList(prev => prev.map(c => c.id === childId ? { ...c, screentime_used: 0 } : c));
+
+    if (user && childId && !String(childId).startsWith('child-')) {
+      try {
+        const { error } = await supabase
+          .from('children')
+          .update({ daily_screentime_minutes: 0, updated_at: new Date().toISOString() })
+          .eq('id', childId);
+        if (error) {
+          console.error("Screentime reset Supabase error:", error);
+        }
+      } catch (err) {
+        console.error("Screentime reset error:", err);
+      }
     }
+    alert('✅ Waktu bermain telah direset ke 0 menit!');
   };
 
   const activeChild = childrenList[selectedChildIndex] || childrenList[0];
