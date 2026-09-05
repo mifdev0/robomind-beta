@@ -34,28 +34,28 @@ const Hero = () => {
       subtitle: i18n.language === 'en' 
         ? "Transforming passive screen time into a scientifically calibrated catalyst for Prefrontal Cortex development in children aged 6 to 12." 
         : "Mengubah screen time pasif menjadi katalis terkalibrasi ilmiah untuk perkembangan Prefrontal Cortex pada anak usia 6 hingga 12 tahun.",
-      img: "https://images.unsplash.com/photo-1507668077129-56e32842fceb?w=1920&auto=format&fit=crop&q=80"
+      img: "/assets/image hero/foto robomind hero 1.png"
     },
     {
       id: 1,
       tag: i18n.language === 'en' ? "FUTURE EDUCATION PLATFORM" : "PLATFORM EDUKASI MASA DEPAN",
       title: i18n.language === 'en' ? "Hone Children's Cognitive & Logic" : "Asah Potensi Kognitif & Logika Anak",
       subtitle: i18n.language === 'en' ? "Connect your child's game, monitor development metrics in real-time, and get specific recommendations from child psychologists." : "Hubungkan game anak Anda, pantau metrik perkembangannya secara real-time, dan dapatkan rekomendasi spesifik dari psikolog anak.",
-      img: "https://images.unsplash.com/photo-1577896851231-70ef18881754?w=1920&auto=format&fit=crop&q=80"
+      img: "/assets/images/robomind_hero.png"
     },
     {
       id: 2,
       tag: i18n.language === 'en' ? "AI GAME TECHNOLOGY" : "TEKNOLOGI GAME AI",
       title: i18n.language === 'en' ? "Exciting Adventure Full of Challenges" : "Petualangan Seru Penuh Tantangan",
       subtitle: i18n.language === 'en' ? "Play while honing coding logic. Let your little one's imagination fly high without limits." : "Bermain sambil mengasah logika coding. Biarkan imajinasi si kecil terbang tinggi tanpa batas.",
-      img: "https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=1920&auto=format&fit=crop&q=80"
+      img: "/assets/images/hero_classroom.png"
     },
     {
       id: 3,
       tag: i18n.language === 'en' ? "REAL-TIME MONITORING" : "PANTUAN REAL-TIME",
       title: i18n.language === 'en' ? "See Development Directly" : "Lihat Perkembangan Secara Langsung",
       subtitle: i18n.language === 'en' ? "Access an exclusive dashboard to track language competence, focus, and problem solving." : "Akses dashboard eksklusif untuk melacak kompetensi bahasa, fokus, dan pemecahan masalah.",
-      img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=1920&auto=format&fit=crop&q=80"
+      img: "/bule_character.png"
     }
   ];
 
