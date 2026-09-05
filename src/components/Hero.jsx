@@ -18,23 +18,15 @@ const Hero = () => {
 
   return (
     <section id="beranda" className="relative w-full h-[85vh] min-h-[580px] sm:h-[70vh] md:h-[60vh] lg:h-[620px] bg-slate-950 overflow-hidden">
-      {/* Background Image Container with Sharp Fit Rendering */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-950 flex items-center justify-center">
-        {/* Ambient background glow to fill widescreen */}
-        <img 
-          src={heroData.img} 
-          alt="" 
-          aria-hidden="true"
-          className="absolute inset-0 w-full h-full object-cover blur-3xl opacity-25 scale-110 pointer-events-none"
-        />
-        {/* True Sharp Fit Image */}
+      {/* Background Image Container with Full Cover Rendering */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden bg-slate-950">
         <img 
           src={heroData.img} 
           alt="RoboMind Hero Banner" 
-          className="w-full h-full object-contain object-center z-0"
+          className="w-full h-full object-cover object-center"
         />
         {/* Contrast Overlay for Text Readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-slate-950/30 z-[1]" />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/50 to-slate-950/35" />
       </div>
 
       {/* Hero Content */}
