@@ -505,12 +505,27 @@ const ParentDashboard = () => {
                       badgeColor = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
                     }
 
+                    // Format timestamp
+                    let timeFormatted = 'Baru saja';
+                    if (s.completed_at || s.created_at) {
+                      try {
+                        const dateObj = new Date(s.completed_at || s.created_at);
+                        const hours = String(dateObj.getHours()).padStart(2, '0');
+                        const mins = String(dateObj.getMinutes()).padStart(2, '0');
+                        const isToday = new Date().toDateString() === dateObj.toDateString();
+                        timeFormatted = isToday ? `${hours}:${mins}` : `${dateObj.getDate()}/${dateObj.getMonth() + 1} ${hours}:${mins}`;
+                      } catch (e) {}
+                    }
+
                     return (
                       <div key={idx} className="p-2.5 rounded-xl bg-gray-50 dark:bg-slate-900/60 border border-gray-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs">
                         <div className="flex flex-col gap-0.5">
                           <div className="flex items-center gap-2">
                             <span className="font-extrabold text-gray-900 dark:text-white">{title}</span>
                             <span className="text-[10px] font-bold text-gray-500 dark:text-gray-400">Level {s.level_reached || 1}</span>
+                            <span className="text-[9px] font-extrabold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/80 px-1.5 py-0.2 rounded border border-cyan-300 dark:border-cyan-800 flex items-center gap-0.5">
+                              🕒 {timeFormatted}
+                            </span>
                           </div>
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[9px] font-extrabold border w-max ${badgeColor}`}>
                             {pfcBadge}
