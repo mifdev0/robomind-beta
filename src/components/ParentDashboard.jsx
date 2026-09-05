@@ -1,3 +1,8 @@
+
+function generateAccessCode() {
+  return Math.floor(10000000 + Math.random() * 90000000).toString();
+}
+
 import { useState, useEffect } from 'react';
 import { Radar } from 'react-chartjs-2';
 import {
@@ -45,6 +50,58 @@ const ParentDashboard = () => {
 
   const [recentSessions, setRecentSessions] = useState([]);
 
+  
+  const [showAddChildModal, setShowAddChildModal] = useState(false);
+  const [newChildName, setNewChildName] = useState('');
+  const [newChildAge, setNewChildAge] = useState(7);
+  const [createdCodeAlert, setCreatedCodeAlert] = useState(null);
+
+  const handleCreateChildProfile = async (e) => {
+    e.preventDefault();
+    if (!newChildName.trim()) return;
+
+    const accessCode = generateAccessCode();
+    const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(newChildName.trim())}&background=0099ff&color=fff&rounded=true`;
+
+    const newChildObj = {
+      name: newChildName.trim(),
+      age: parseInt(newChildAge) || 7,
+      level: 1,
+      total_xp: 0,
+      coins: 100,
+      access_token: accessCode,
+      access_code: accessCode,
+      avatar_url: avatarUrl,
+      daily_screentime_minutes: 0,
+      screentime_limit_minutes: 60
+    };
+
+    if (user) {
+      newChildObj.parent_id = user.id;
+      try {
+        const { data, error } = await supabase
+          .from('children')
+          .insert(newChildObj)
+          .select()
+          .single();
+
+        if (data) {
+          newChildObj.id = data.id;
+        }
+      } catch (err) {
+        console.warn("Error creating child profile in Supabase:", err);
+      }
+    } else {
+      newChildObj.id = 'child-' + Date.now();
+    }
+
+    setChildrenList(prev => [...prev, newChildObj]);
+    setSelectedChildIndex(childrenList.length);
+    setShowAddChildModal(false);
+    setNewChildName('');
+    setCreatedCodeAlert({ name: newChildName.trim(), code: accessCode });
+  };
+
   const activeChild = childrenList[selectedChildIndex] || childrenList[0];
 
   // Detect dark mode reactively
@@ -82,16 +139,23 @@ const ParentDashboard = () => {
           .order('created_at', { ascending: true });
 
         if (children && children.length > 0) {
-          const mapped = children.map(c => ({
-            id: c.id,
-            name: c.name || 'Anak Anda',
-            level: c.level || 1,
-            total_xp: c.total_xp || 0,
-            coins: c.coins || 0,
-            screentime_used: c.daily_screentime_minutes || 0,
-            screentime_limit: c.screentime_limit_minutes || 60,
-            avatar_url: c.avatar_url || 'https://lh3.googleusercontent.com/aida/AP1WRLuAuBP2g-1fKowz_Tbuz4ERYAIImKOgnE-ccTI2b2Gsr6d06SKenfv1RQB25E0K9XygYMzTuL0qTSdxi9RRIyCHWc4KmTsi5BdLvGJ4bMark08FDSMIlku6Pi-H2Sr7OxfQcMVRj9GcNh1DbUvVgNR118cbdFUYpbIaAAifC0G90-fKobSmMyxffh4j3lXqQ4iqm2X_T528PByMVPr4tlqwKyKaZJdgMNQ7J6dUqHdGswG2IqIg6g_zAEVO'
-          }));
+          const mapped = children.map(c => {
+            const code = c.access_token || c.access_code || generateAccessCode();
+            if (!c.access_token && !c.access_code && user) {
+              supabase.from('children').update({ access_token: code, access_code: code }).eq('id', c.id).then(() => {});
+            }
+            return {
+              id: c.id,
+              name: c.name || 'Anak Anda',
+              level: c.level || 1,
+              total_xp: c.total_xp || 0,
+              coins: c.coins || 0,
+              access_code: code,
+              screentime_used: c.daily_screentime_minutes || 0,
+              screentime_limit: c.screentime_limit_minutes || 60,
+              avatar_url: c.avatar_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(c.name || 'Anak') + '&background=0099ff&color=fff&rounded=true'
+            };
+          });
           setChildrenList(mapped);
 
           const currentC = mapped[selectedChildIndex] || mapped[0];
@@ -225,7 +289,15 @@ const ParentDashboard = () => {
               : 'Pantau metrik perkembangan kognitif, sisa waktu layar, dan perkembangan setiap anak Anda secara individual.'}
           </p>
 
-          {/* Child Switcher Tabs for Parents with Multiple Children */}
+          {/* Add Child & Switcher Tabs */}
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+              <button
+                onClick={() => setShowAddChildModal(true)}
+                className="px-4 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1.5"
+              >
+                <span>➕ Tambah Anak Baru (Buat Kode Akses)</span>
+              </button>
+            </div>
           {childrenList.length > 1 && (
             <div className="mt-6 inline-flex p-1.5 rounded-2xl bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 shadow-sm gap-2">
               {childrenList.map((c, idx) => (
@@ -264,6 +336,26 @@ const ParentDashboard = () => {
                     <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400">
                       Level {activeChild.level} • {activeChild.total_xp} XP Total • 🪙 {activeChild.coins} Koin
                     </span>
+
+                    {/* 8-Digit Access Code Badge */}
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-300 dark:border-cyan-700 text-xs">
+                        <span className="font-bold text-gray-700 dark:text-gray-200">🔑 Kode Akses Game:</span>
+                        <span className="font-mono font-black text-cyan-700 dark:text-cyan-300 tracking-widest text-sm">
+                          {activeChild.access_code ? `${activeChild.access_code.slice(0, 4)} - ${activeChild.access_code.slice(4)}` : '1234 - 5678'}
+                        </span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          const code = activeChild.access_code || '12345678';
+                          navigator.clipboard.writeText(code);
+                          alert(`✅ Kode Akses (${code}) disalin! Berikan kode ini ke anak untuk masuk di Aplikasi Game.`);
+                        }}
+                        className="text-xs font-extrabold px-3 py-1 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white transition-all shadow-sm active:scale-95 flex items-center gap-1"
+                      >
+                        📋 Salin Kode
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -352,6 +444,98 @@ const ParentDashboard = () => {
 
         </div>
       </div>
+    
+      {/* MODAL: TAMBAH PROFIL ANAK & CODE GENERATOR */}
+      {showAddChildModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full border border-cyan-400 shadow-2xl relative">
+            <button 
+              onClick={() => setShowAddChildModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-white font-bold"
+            >
+              ✕
+            </button>
+            
+            <div className="text-center mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-2 text-2xl">
+                👶
+              </div>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka">Tambah Profil Anak</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">Sistem akan membuatkan 8-digit Kode Akses Game secara otomatis</p>
+            </div>
+
+            <form onSubmit={handleCreateChildProfile} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Panggilan Anak</label>
+                <input
+                  type="text"
+                  placeholder="Contoh: Kenzo, Aira, Rafa..."
+                  value={newChildName}
+                  onChange={e => setNewChildName(e.target.value)}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Usia Anak (Tahun)</label>
+                <input
+                  type="number"
+                  min="3"
+                  max="15"
+                  value={newChildAge}
+                  onChange={e => setNewChildAge(e.target.value)}
+                  required
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-gray-50 dark:bg-slate-900 text-gray-900 dark:text-white text-xs focus:outline-none focus:ring-2 focus:ring-cyan-500"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95"
+              >
+                Buat Profil & Generate Kode Akses
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ALERT MODAL: HASIL KODE AKSES CREATED */}
+      {createdCodeAlert && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full border-2 border-emerald-400 shadow-2xl text-center">
+            <div className="w-14 h-14 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-500 flex items-center justify-center mx-auto mb-3 text-3xl">
+              🎉
+            </div>
+            <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka mb-1">
+              Profil "{createdCodeAlert.name}" Berhasil Dibuat!
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
+              Berikan Kode Akses 8-Digit ini kepada anak untuk masuk di Aplikasi Game:
+            </p>
+
+            <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4">
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 block mb-1">🔑 KODE AKSES GAME</span>
+              <span className="font-mono font-black text-2xl text-cyan-600 dark:text-cyan-400 tracking-widest">
+                {createdCodeAlert.code.slice(0, 4)} - {createdCodeAlert.code.slice(4)}
+              </span>
+            </div>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(createdCodeAlert.code);
+                alert('✅ Kode Akses disalin ke clipboard!');
+                setCreatedCodeAlert(null);
+              }}
+              className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95"
+            >
+              Salin Kode & Selesai
+            </button>
+          </div>
+        </div>
+      )}
+
     </section>
   );
 };
