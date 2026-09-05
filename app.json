@@ -1,0 +1,31 @@
+{
+  "expo": {
+    "name": "RoboMind Game",
+    "slug": "robomind-game",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./public/robomind_robot_avatar.png",
+    "userInterfaceStyle": "dark",
+    "splash": {
+      "image": "./public/robomind_robot_avatar.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#050a16"
+    },
+    "android": {
+      "package": "com.robomind.beta",
+      "adaptiveIcon": {
+        "foregroundImage": "./public/robomind_robot_avatar.png",
+        "backgroundColor": "#050a16"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "web": {
+      "favicon": "./public/robomind_robot_avatar.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "86b297f7-1329-4877-99bf-7c2fb26193b9"
+      }
+    }
+  }
+}
