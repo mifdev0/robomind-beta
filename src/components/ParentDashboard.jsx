@@ -505,21 +505,24 @@ const ParentDashboard = () => {
                       badgeColor = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
                     }
 
-                    // Format timestamp properly converting UTC ISO string to local time
+                    // Format timestamp with explicit Asia/Jakarta timezone for Indonesia Date & Time
                     let timeFormatted = 'Baru saja';
                     if (s.completed_at || s.created_at) {
                       try {
                         const dateObj = new Date(s.completed_at || s.created_at);
                         if (!isNaN(dateObj.getTime())) {
-                          timeFormatted = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', hour12: false });
-                          const today = new Date();
-                          const isSameDay = today.getDate() === dateObj.getDate() && 
-                                           today.getMonth() === dateObj.getMonth() && 
-                                           today.getFullYear() === dateObj.getFullYear();
-                          if (!isSameDay) {
-                            const dateStr = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'numeric' });
-                            timeFormatted = `${dateStr} ${timeFormatted}`;
-                          }
+                          const datePart = dateObj.toLocaleDateString('id-ID', {
+                            day: 'numeric',
+                            month: 'short',
+                            timeZone: 'Asia/Jakarta'
+                          });
+                          const timePart = dateObj.toLocaleTimeString('id-ID', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            hour12: false,
+                            timeZone: 'Asia/Jakarta'
+                          }).replace('.', ':');
+                          timeFormatted = `${datePart}, ${timePart} WIB`;
                         }
                       } catch (e) {}
                     }
