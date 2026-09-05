@@ -270,7 +270,7 @@ const ParentDashboard = () => {
 
     loadParentEcosystem();
 
-    // Subscribe to realtime updates from Supabase for sessions, skills, and children
+    // 1. Subscribe to realtime updates from Supabase for sessions, skills, and children
     const channel = supabase
       .channel('realtime_game_progress_web')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'game_sessions' }, () => {
@@ -284,8 +284,14 @@ const ParentDashboard = () => {
       })
       .subscribe();
 
+    // 2. High-speed 4-second polling fallback to guarantee smooth 100% sync without manual page refresh
+    const syncInterval = setInterval(() => {
+      loadParentEcosystem();
+    }, 4000);
+
     return () => {
       supabase.removeChannel(channel);
+      clearInterval(syncInterval);
     };
   }, [user, selectedChildIndex]);
 
