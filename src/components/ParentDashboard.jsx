@@ -85,11 +85,19 @@ const ParentDashboard = () => {
           .select()
           .single();
 
+        if (error) {
+          console.error("Supabase insert child error:", error);
+          alert(`⚠️ Profil "${newChildObj.name}" gagal disimpan ke server: ${error.message}. Kode akses tidak akan bisa dipakai di game. Coba buka Dashboard Pemantauan lalu ulangi.`);
+          return;
+        }
+
         if (data) {
           newChildObj.id = data.id;
         }
       } catch (err) {
-        console.warn("Error creating child profile in Supabase:", err);
+        console.error("Error creating child profile in Supabase:", err);
+        alert(`⚠️ Gagal menyimpan profil "${newChildObj.name}" ke server. Pastikan Anda sudah login dan cek koneksi internet.`);
+        return;
       }
     } else {
       newChildObj.id = 'child-' + Date.now();
@@ -100,6 +108,22 @@ const ParentDashboard = () => {
     setShowAddChildModal(false);
     setNewChildName('');
     setCreatedCodeAlert({ name: newChildName.trim(), code: accessCode });
+  };
+
+  const resetScreentime = async (childId) => {
+    if (!window.confirm('Apakah yakin ingin mereset waktu bermain harian untuk anak ini? Waktu akan direset ke 0 menit.')) return;
+    try {
+      const { error } = await supabase
+        .from('children')
+        .update({ daily_screentime_minutes: 0 })
+        .eq('id', childId);
+      if (error) throw error;
+      alert('✅ Waktu bermain telah direset ke 0 menit!');
+      loadParentEcosystem();
+    } catch (err) {
+      console.error("Screentime reset error:", err);
+      alert('⚠️ Gagal mereset waktu bermain. Coba lagi nanti.');
+    }
   };
 
   const activeChild = childrenList[selectedChildIndex] || childrenList[0];
@@ -142,7 +166,9 @@ const ParentDashboard = () => {
           const mapped = children.map(c => {
             const code = c.access_token || c.access_code || generateAccessCode();
             if (!c.access_token && !c.access_code && user) {
-              supabase.from('children').update({ access_token: code, access_code: code }).eq('id', c.id).then(() => {});
+              supabase.from('children').update({ access_token: code, access_code: code }).eq('id', c.id)
+                .then(r => { if (r.error) console.error("Supabase update child access code error:", r.error); })
+                .catch(err => console.error("Supabase update child access code error:", err));
             }
             return {
               id: c.id,
@@ -384,6 +410,11 @@ const ParentDashboard = () => {
                 <div className="flex items-center justify-between mt-2 text-[10px] text-gray-500 dark:text-gray-400">
                   <span>Sisa Waktu Aman: {Math.max(0, activeChild.screentime_limit - activeChild.screentime_used)} Menit</span>
                   <span className="text-emerald-600 dark:text-emerald-400 font-bold">Batas Sehat Terjaga ✓</span>
+                  <button
+                    onClick={() => resetScreentime(activeChild.id)}
+                    className="ml-2 text-xs font-bold text-cyan-400 hover:text-white">
+                    🔄 Reset
+                  </button>
                 </div>
               </div>
 
