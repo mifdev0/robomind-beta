@@ -505,22 +505,22 @@ const ParentDashboard = () => {
                       badgeColor = 'bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-800';
                     }
 
-                    // Format timestamp with explicit Asia/Jakarta timezone for Indonesia Date & Time
+                    // Format timestamp cleanly without double-shifting ISO string
                     let timeFormatted = 'Baru saja';
-                    if (s.completed_at || s.created_at) {
+                    const rawTime = s.completed_at || s.created_at;
+                    if (rawTime) {
                       try {
-                        const dateObj = new Date(s.completed_at || s.created_at);
+                        const dateObj = new Date(rawTime);
                         if (!isNaN(dateObj.getTime())) {
+                          // Format in Indonesian locale
                           const datePart = dateObj.toLocaleDateString('id-ID', {
                             day: 'numeric',
-                            month: 'short',
-                            timeZone: 'Asia/Jakarta'
+                            month: 'short'
                           });
                           const timePart = dateObj.toLocaleTimeString('id-ID', {
                             hour: '2-digit',
                             minute: '2-digit',
-                            hour12: false,
-                            timeZone: 'Asia/Jakarta'
+                            hour12: false
                           }).replace('.', ':');
                           timeFormatted = `${datePart}, ${timePart} WIB`;
                         }
