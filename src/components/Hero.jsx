@@ -13,7 +13,7 @@ const Hero = () => {
     subtitle: i18n.language === 'en' 
       ? "Transforming passive screen time into a scientifically calibrated catalyst for Prefrontal Cortex development in children aged 6 to 12." 
       : "Mengubah screen time pasif menjadi katalis terkalibrasi ilmiah untuk perkembangan Prefrontal Cortex pada anak usia 6 hingga 12 tahun.",
-    img: "/hero_banner.jpeg"
+    img: "/hero-web.png"
   };
 
   return (
