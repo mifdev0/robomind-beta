@@ -69,9 +69,19 @@ const CommunityPage = () => {
   const { t, i18n } = useTranslation();
   const { user } = useAuth();
   
-  const [posts, setPosts] = useState([]);
+  const [posts, setPosts] = useState(() => {
+    const local = localStorage.getItem('robomind_community_posts');
+    if (local) {
+      try {
+        return JSON.parse(local);
+      } catch (e) {
+        return INITIAL_POSTS;
+      }
+    }
+    return INITIAL_POSTS;
+  });
   const [filteredPosts, setFilteredPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -95,42 +105,60 @@ const CommunityPage = () => {
   // Fetch posts from Supabase or fallback to LocalStorage
   useEffect(() => {
     const fetchPosts = async () => {
-      setLoading(true);
+      if (posts.length === 0) {
+        setLoading(true);
+      }
+
+      const withTimeout = (promise, ms = 2500) => {
+        return Promise.race([
+          promise,
+          new Promise((_, reject) => setTimeout(() => reject(new Error('Network timeout')), ms))
+        ]);
+      };
+
       try {
-        const { data, error } = await supabase
-          .from('community_posts')
-          .select('*')
-          .order('created_at', { ascending: false });
+        const { data, error } = await withTimeout(
+          supabase
+            .from('community_posts')
+            .select('*')
+            .order('created_at', { ascending: false })
+        );
 
         if (error) throw new Error('Supabase query failed');
 
         if (data && data.length > 0) {
           setPosts(data);
+          localStorage.setItem('robomind_community_posts', JSON.stringify(data));
           setIsUsingSupabase(true);
         } else {
           // If empty, seed with initial mock data
-          const { error: seedError } = await supabase.from('community_posts').insert(
-            INITIAL_POSTS.map(p => ({
-              id: p.id,
-              title: p.title,
-              content: p.content,
-              category: p.category,
-              author_name: p.author_name,
-              author_avatar: p.author_avatar,
-              created_at: p.created_at,
-              likes: p.likes,
-              comments: p.comments,
-              liked_by: p.liked_by
-            }))
+          const { error: seedError } = await withTimeout(
+            supabase.from('community_posts').insert(
+              INITIAL_POSTS.map(p => ({
+                id: p.id,
+                title: p.title,
+                content: p.content,
+                category: p.category,
+                author_name: p.author_name,
+                author_avatar: p.author_avatar,
+                created_at: p.created_at,
+                likes: p.likes,
+                comments: p.comments,
+                liked_by: p.liked_by
+              }))
+            )
           );
           
           if (!seedError) {
-            const { data: seededData } = await supabase
-              .from('community_posts')
-              .select('*')
-              .order('created_at', { ascending: false });
+            const { data: seededData } = await withTimeout(
+              supabase
+                .from('community_posts')
+                .select('*')
+                .order('created_at', { ascending: false })
+            );
             if (seededData) {
               setPosts(seededData);
+              localStorage.setItem('robomind_community_posts', JSON.stringify(seededData));
               setIsUsingSupabase(true);
             }
           } else {
@@ -138,6 +166,7 @@ const CommunityPage = () => {
           }
         }
       } catch (err) {
+        console.warn('Supabase loading failed or timed out. Falling back to LocalStorage.', err);
         loadFromLocalStorage();
       } finally {
         setLoading(false);
@@ -361,9 +390,15 @@ const CommunityPage = () => {
 
     try {
       if (isUsingSupabase) {
-        const { error } = await supabase
+        const insertPromise = supabase
           .from('community_posts')
           .insert([newPost]);
+
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Network timeout publishing post')), 3000)
+        );
+
+        const { error } = await Promise.race([insertPromise, timeoutPromise]);
 
         if (error) throw error;
         setPosts([newPost, ...posts]);
@@ -383,8 +418,21 @@ const CommunityPage = () => {
       }, 1000);
 
     } catch (err) {
-      console.error(err);
-      setSubmitError(i18n.language === 'en' ? 'Failed to publish post to database' : 'Gagal mempublikasikan cerita ke database');
+      console.error('Failed to submit post to Supabase, saving locally instead:', err);
+      // Fallback to local storage so user post is not lost
+      const updated = [newPost, ...posts];
+      savePostsState(updated);
+      setIsUsingSupabase(false); // Switch to offline mode
+      
+      setSubmitSuccess(true);
+      setNewContent('');
+      setCustomAuthorName('');
+      setSelectedFile(null);
+      
+      setTimeout(() => {
+        setShowCreateModal(false);
+        setSubmitSuccess(false);
+      }, 1000);
     } finally {
       setIsSubmitting(false);
     }
