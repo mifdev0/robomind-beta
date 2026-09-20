@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Radar } from 'react-chartjs-2';
+import { useTranslation } from 'react-i18next';
 import { 
   Chart as ChartJS, 
   RadialLinearScale, 
@@ -16,37 +17,102 @@ import { CheckCircle2, ChevronRight, ChevronLeft, AlertCircle, ArrowRight, Lock,
 ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 const QUESTIONS = [
-  { id: 1, text: "1. Dapat mempedulikan perasaan orang lain", subscale: "prososial" },
-  { id: 2, text: "2. Gelisah, terlalu aktif, tidak dapat diam", subscale: "hiperaktivitas" },
-  { id: 3, text: "3. Sering mengeluh sakit kepala atau sakit perut", subscale: "emosional" },
-  { id: 4, text: "4. Bersedia berbagi dengan anak-anak lain", subscale: "prososial" },
-  { id: 5, text: "5. Sering marah atau kehilangan kesabaran", subscale: "perilaku" },
-  { id: 6, text: "6. Cenderung main sendirian", subscale: "sebaya" },
-  { id: 7, text: "7. Pada umumnya bertingkah laku baik", subscale: "perilaku" },
-  { id: 8, text: "8. Banyak kekhawatiran, sering cemas", subscale: "emosional" },
-  { id: 9, text: "9. Suka menolong anak lain", subscale: "prososial" },
-  { id: 10, text: "10. Terus menerus bergerak dengan resah", subscale: "hiperaktivitas" },
-  { id: 11, text: "11. Punya teman baik", subscale: "sebaya" },
-  { id: 12, text: "12. Sering berkelahi dengan anak lain", subscale: "perilaku" },
-  { id: 13, text: "13. Sering tampak sedih atau murung", subscale: "emosional" },
-  { id: 14, text: "14. Disukai oleh anak-anak lain", subscale: "sebaya" },
-  { id: 15, text: "15. Mudah beralih perhatiannya", subscale: "hiperaktivitas" },
-  { id: 16, text: "16. Gugup pada situasi baru", subscale: "emosional" },
-  { id: 17, text: "17. Baik hati pada yang lebih muda", subscale: "prososial" },
-  { id: 18, text: "18. Sering berbohong", subscale: "perilaku" },
-  { id: 19, text: "19. Diganggu anak lain", subscale: "sebaya" },
-  { id: 20, text: "20. Menawarkan diri untuk membantu orang tua/guru", subscale: "prososial" },
-  { id: 21, text: "21. Berpikir sebelum bertindak", subscale: "hiperaktivitas" },
-  { id: 22, text: "22. Mencuri dari rumah/sekolah", subscale: "perilaku" },
-  { id: 23, text: "23. Lebih akrab dengan orang dewasa dibanding anak sebayanya", subscale: "sebaya" },
-  { id: 24, text: "24. Banyak ketakutan", subscale: "emosional" },
-  { id: 25, text: "25. Mampu menyelesaikan tugas", subscale: "hiperaktivitas" }
+  { id: 1, subscale: "prososial", text: { id: "1. Dapat mempedulikan perasaan orang lain", en: "1. Considerate of other people's feelings" } },
+  { id: 2, subscale: "hiperaktivitas", text: { id: "2. Gelisah, terlalu aktif, tidak dapat diam", en: "2. Restless, overactive, cannot stay still for long" } },
+  { id: 3, subscale: "emosional", text: { id: "3. Sering mengeluh sakit kepala atau sakit perut", en: "3. Often complains of headaches, stomach-aches or sickness" } },
+  { id: 4, subscale: "prososial", text: { id: "4. Bersedia berbagi dengan anak-anak lain", en: "4. Shares readily with other children" } },
+  { id: 5, subscale: "perilaku", text: { id: "5. Sering marah atau kehilangan kesabaran", en: "5. Often has temper tantrums or hot tempers" } },
+  { id: 6, subscale: "sebaya", text: { id: "6. Cenderung main sendirian", en: "6. Rather solitary, tends to play alone" } },
+  { id: 7, subscale: "perilaku", text: { id: "7. Pada umumnya bertingkah laku baik", en: "7. Generally obedient, usually does what adults request" } },
+  { id: 8, subscale: "emosional", text: { id: "8. Banyak kekhawatiran, sering cemas", en: "8. Many worries, often seems worried" } },
+  { id: 9, subscale: "prososial", text: { id: "9. Suka menolong anak lain", en: "9. Helpful if someone is hurt, upset or feeling ill" } },
+  { id: 10, subscale: "hiperaktivitas", text: { id: "10. Terus menerus bergerak dengan resah", en: "10. Constantly fidgeting or squirming" } },
+  { id: 11, subscale: "sebaya", text: { id: "11. Punya teman baik", en: "11. Has at least one good friend" } },
+  { id: 12, subscale: "perilaku", text: { id: "12. Sering berkelahi dengan anak lain", en: "12. Often fights with other children or bullies them" } },
+  { id: 13, subscale: "emosional", text: { id: "13. Sering tampak sedih atau murung", en: "13. Often unhappy, down-hearted or tearful" } },
+  { id: 14, subscale: "sebaya", text: { id: "14. Disukai oleh anak-anak lain", en: "14. Generally liked by other children" } },
+  { id: 15, subscale: "hiperaktivitas", text: { id: "15. Mudah beralih perhatiannya", en: "15. Easily distracted, concentration wanders" } },
+  { id: 16, subscale: "emosional", text: { id: "16. Gugup pada situasi baru", en: "16. Nervous or clingy in new situations" } },
+  { id: 17, subscale: "prososial", text: { id: "17. Baik hati pada yang lebih muda", en: "17. Kind to younger children" } },
+  { id: 18, subscale: "perilaku", text: { id: "18. Sering berbohong", en: "18. Often lies or cheats" } },
+  { id: 19, subscale: "sebaya", text: { id: "19. Diganggu anak lain", en: "19. Picked on or bullied by other children" } },
+  { id: 20, subscale: "prososial", text: { id: "20. Menawarkan diri untuk membantu orang tua/guru", en: "20. Often volunteers to help others (parents, teachers, other children)" } },
+  { id: 21, subscale: "hiperaktivitas", text: { id: "21. Berpikir sebelum bertindak", en: "21. Thinks things out before acting" } },
+  { id: 22, subscale: "perilaku", text: { id: "22. Mencuri dari rumah/sekolah", en: "22. Steals from home, school or elsewhere" } },
+  { id: 23, subscale: "sebaya", text: { id: "23. Lebih akrab dengan orang dewasa dibanding anak sebayanya", en: "23. Gets on better with adults than with other children" } },
+  { id: 24, subscale: "emosional", text: { id: "24. Banyak ketakutan", en: "24. Many fears, easily scared" } },
+  { id: 25, subscale: "hiperaktivitas", text: { id: "25. Mampu menyelesaikan tugas", en: "25. Sees tasks through to the end, good attention span" } }
 ];
 
 const REVERSE_SCORED = [7, 14, 15, 17, 18];
 const QUESTIONS_PER_PAGE = 5;
 
+const STRINGS = {
+  id: {
+    badge: 'Modul SDQ Terintegrasi',
+    title: 'Kuesioner Skrining Awal',
+    intro: (n) => `Jawablah ${n} pertanyaan berikut berdasarkan perilaku anak Anda selama 6 bulan terakhir.`,
+    part: (a, b) => `Bagian ${a} dari ${b}`,
+    answered: (a, b) => `${a} / ${b} Terjawab`,
+    optNot: 'Tidak Benar',
+    optSome: 'Agak Benar',
+    optAlways: 'Selalu Benar',
+    back: 'Kembali',
+    next: 'Selanjutnya',
+    submit: 'Kirim Hasil',
+    reportTitle: 'Laporan Analitik SDQ',
+    reportSubtitle: 'Berdasarkan instrumen skrining standar klinis. Berikut adalah interpretasi profil kognitif anak Anda.',
+    mapTitle: 'Peta Distribusi Perilaku',
+    mapLegend: 'Area Kognitif Anak',
+    indexLabel: 'Indeks Kesulitan Keseluruhan',
+    category: 'Kategori',
+    statuses: { normal: 'Normal', borderline: 'Borderline', abnormal: 'Abnormal / Perlu Perhatian' },
+    hyper: { normal: 'Normal', borderline: 'Borderline', abnormal: 'Abnormal' },
+    insightTitle: 'Insight Adaptasi Game',
+    unlockTitle: 'Buka Potensi Penuh',
+    unlockBody: 'Ingin Laporan Analisis Mingguan Mendalam & Rekomendasi Aktivitas Nyata dari Psikolog Anak? Hubungkan Akun Game Anda dan Berlangganan Paket Premium SaaS Sekarang.',
+    unlockBtn: 'Aktifkan Premium SaaS Analysis',
+    consult: 'Konsultasi Hasil',
+    finish: 'Selesai & Kembali',
+    dataset: 'Skor Anak',
+    radar: ['Emosional', 'Perilaku', 'Hiperaktivitas', 'Masalah Sebaya', 'Prososial'],
+  },
+  en: {
+    badge: 'Integrated SDQ Module',
+    title: 'Early Screening Questionnaire',
+    intro: (n) => `Answer the following ${n} questions based on your child's behavior over the last 6 months.`,
+    part: (a, b) => `Part ${a} of ${b}`,
+    answered: (a, b) => `${a} / ${b} Answered`,
+    optNot: 'Not True',
+    optSome: 'Somewhat True',
+    optAlways: 'Certainly True',
+    back: 'Back',
+    next: 'Next',
+    submit: 'Submit Results',
+    reportTitle: 'SDQ Analytics Report',
+    reportSubtitle: "Based on standard clinical screening instruments. Here is the interpretation of your child's cognitive profile.",
+    mapTitle: 'Behavior Distribution Map',
+    mapLegend: 'Child Cognitive Area',
+    indexLabel: 'Overall Difficulty Index',
+    category: 'Category',
+    statuses: { normal: 'Normal', borderline: 'Borderline', abnormal: 'Abnormal / Needs Attention' },
+    hyper: { normal: 'Normal', borderline: 'Borderline', abnormal: 'Abnormal' },
+    insightTitle: 'Game Adaptation Insight',
+    unlockTitle: 'Unlock Full Potential',
+    unlockBody: 'Want in-depth Weekly Analysis Reports & Real Activity Recommendations from Child Psychologists? Connect your Game Account and Subscribe to the Premium SaaS Plan now.',
+    unlockBtn: 'Activate Premium SaaS Analysis',
+    consult: 'Consult Results',
+    finish: 'Finish & Return',
+    dataset: "Child's Score",
+    radar: ['Emotional', 'Conduct', 'Hyperactivity', 'Peer Problems', 'Prosocial'],
+  },
+};
+
 const ScreeningQuiz = () => {
+  const { i18n } = useTranslation();
+  const lang = i18n.language === 'en' ? 'en' : 'id';
+  const T = STRINGS[lang];
+
   const [answers, setAnswers] = useState({});
   const [currentPage, setCurrentPage] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -120,23 +186,23 @@ const ScreeningQuiz = () => {
 
   // Status mapping
   const getTotalStatus = (score) => {
-    if (score <= 13) return { label: 'Normal', color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
-    if (score <= 16) return { label: 'Borderline', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' };
-    return { label: 'Abnormal / Perlu Perhatian', color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200' };
+    if (score <= 13) return { label: T.statuses.normal, color: 'text-emerald-600', bg: 'bg-emerald-50', border: 'border-emerald-200' };
+    if (score <= 16) return { label: T.statuses.borderline, color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' };
+    return { label: T.statuses.abnormal, color: 'text-rose-600', bg: 'bg-rose-50', border: 'border-rose-200' };
   };
 
   const getHyperStatus = (score) => {
-    if (score <= 5) return 'Normal';
-    if (score === 6) return 'Borderline';
-    return 'Abnormal';
+    if (score <= 5) return T.hyper.normal;
+    if (score === 6) return T.hyper.borderline;
+    return T.hyper.abnormal;
   };
 
   // Radar Chart Setup
   const chartData = scores ? {
-    labels: ['Emosional', 'Perilaku', 'Hiperaktivitas', 'Masalah Sebaya', 'Prososial'],
+    labels: T.radar,
     datasets: [
       {
-        label: 'Skor Anak',
+        label: T.dataset,
         data: [
           scores.subScores.emosional, 
           scores.subScores.perilaku, 
@@ -188,13 +254,13 @@ const ScreeningQuiz = () => {
         {!isSubmitted && (
           <div className="text-center max-w-3xl mx-auto mb-12">
             <span className="inline-block py-1.5 px-4 rounded-full bg-primary-100 text-primary-700 font-bold text-xs tracking-wider mb-4 uppercase">
-              Modul SDQ Terintegrasi
+              {T.badge}
             </span>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 font-fredoka mb-4">
-              Kuesioner Skrining Awal
+              {T.title}
             </h2>
             <p className="text-lg text-gray-600 font-outfit">
-              Jawablah {QUESTIONS.length} pertanyaan berikut berdasarkan perilaku anak Anda selama 6 bulan terakhir.
+              {T.intro(QUESTIONS.length)}
             </p>
           </div>
         )}
@@ -219,19 +285,19 @@ const ScreeningQuiz = () => {
 
               <div className="p-6 md:p-10">
                 <div className="flex justify-between items-center mb-8">
-                  <h3 className="font-fredoka text-xl font-bold text-gray-800">Bagian {currentPage + 1} dari {totalPages}</h3>
-                  <span className="text-sm font-bold text-gray-400 font-outfit">{Object.keys(answers).length} / {QUESTIONS.length} Terjawab</span>
+                  <h3 className="font-fredoka text-xl font-bold text-gray-800">{T.part(currentPage + 1, totalPages)}</h3>
+                  <span className="text-sm font-bold text-gray-400 font-outfit">{T.answered(Object.keys(answers).length, QUESTIONS.length)}</span>
                 </div>
 
                 <div className="space-y-6 md:space-y-8">
                   {currentQuestions.map(q => (
                     <div key={q.id} className="bg-gray-50 rounded-2xl p-5 md:p-6 border border-gray-100 hover:border-primary-200 transition-colors">
-                      <p className="text-base md:text-lg font-medium text-gray-800 font-outfit mb-4">{q.text}</p>
+                      <p className="text-base md:text-lg font-medium text-gray-800 font-outfit mb-4">{q.text[lang]}</p>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {[
-                          { label: 'Tidak Benar', val: 0 },
-                          { label: 'Agak Benar', val: 1 },
-                          { label: 'Selalu Benar', val: 2 }
+                          { label: T.optNot, val: 0 },
+                          { label: T.optSome, val: 1 },
+                          { label: T.optAlways, val: 2 }
                         ].map((opt) => (
                           <button
                             key={opt.val}
@@ -257,14 +323,14 @@ const ScreeningQuiz = () => {
                     disabled={currentPage === 0}
                     className="flex items-center gap-2 px-6 py-3 rounded-full font-bold text-gray-600 hover:bg-gray-100 disabled:opacity-0 transition-all"
                   >
-                    <ChevronLeft size={20} /> Kembali
+                    <ChevronLeft size={20} /> {T.back}
                   </button>
                   <button 
                     onClick={nextStep}
                     disabled={!isCurrentPageComplete()}
                     className="flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 rounded-full font-bold text-white shadow-md shadow-primary-500/20 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
-                    {currentPage === totalPages - 1 ? 'Kirim Hasil' : 'Selanjutnya'} 
+                    {currentPage === totalPages - 1 ? T.submit : T.next} 
                     {currentPage === totalPages - 1 ? <CheckCircle2 size={20} /> : <ChevronRight size={20} />}
                   </button>
                 </div>
@@ -279,10 +345,10 @@ const ScreeningQuiz = () => {
             >
               <div className="text-center max-w-3xl mx-auto mb-10">
                 <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 font-fredoka mb-4">
-                  Laporan Analitik SDQ
+                  {T.reportTitle}
                 </h2>
                 <p className="text-lg text-gray-600 font-outfit">
-                  Berdasarkan instrumen skrining standar klinis. Berikut adalah interpretasi profil kognitif anak Anda.
+                  {T.reportSubtitle}
                 </p>
               </div>
 
@@ -291,14 +357,14 @@ const ScreeningQuiz = () => {
                 <div className="bg-white p-6 md:p-10 rounded-3xl shadow-xl border border-gray-100 flex flex-col items-center justify-center">
                   <h3 className="text-xl font-bold font-fredoka text-gray-800 mb-6 flex items-center gap-2">
                     <Activity className="text-primary-500" />
-                    Peta Distribusi Perilaku
+                    {T.mapTitle}
                   </h3>
                   <div className="w-full max-w-md aspect-square relative">
                     {chartData && <Radar data={chartData} options={chartOptions} />}
                   </div>
                   <div className="mt-8 flex flex-wrap gap-4 justify-center">
                     <div className="flex items-center gap-2 text-sm text-gray-500 font-outfit">
-                      <span className="w-3 h-3 rounded-full bg-primary-500"></span> Area Kognitif Anak
+                      <span className="w-3 h-3 rounded-full bg-primary-500"></span> {T.mapLegend}
                     </div>
                   </div>
                 </div>
@@ -312,7 +378,7 @@ const ScreeningQuiz = () => {
                       <Bot size={100} />
                     </div>
                     <div className="relative z-10">
-                      <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 font-outfit">Indeks Kesulitan Keseluruhan</h4>
+                      <h4 className="text-sm font-bold text-gray-400 uppercase tracking-wider mb-2 font-outfit">{T.indexLabel}</h4>
                       <div className="flex items-end gap-3 mb-4">
                         <span className="text-5xl font-black text-gray-900 font-fredoka leading-none">{scores.totalDifficulties}</span>
                         <span className="text-lg font-bold text-gray-500 mb-1">/ 40</span>
@@ -321,7 +387,7 @@ const ScreeningQuiz = () => {
                       <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full border ${getTotalStatus(scores.totalDifficulties).bg} ${getTotalStatus(scores.totalDifficulties).border}`}>
                         <AlertCircle size={18} className={getTotalStatus(scores.totalDifficulties).color} />
                         <span className={`font-bold text-sm ${getTotalStatus(scores.totalDifficulties).color}`}>
-                          Kategori: {getTotalStatus(scores.totalDifficulties).label}
+                          {T.category}: {getTotalStatus(scores.totalDifficulties).label}
                         </span>
                       </div>
                     </div>
@@ -331,11 +397,20 @@ const ScreeningQuiz = () => {
                   <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-gray-100">
                     <h4 className="text-lg font-bold font-fredoka text-gray-800 mb-4 flex items-center gap-2">
                       <Sparkles className="text-secondary-500" size={20} />
-                      Insight Adaptasi Game
+                      {T.insightTitle}
                     </h4>
                     <p className="text-gray-600 font-outfit leading-relaxed">
-                      Berdasarkan skrining awal, tingkat <strong>Atensi & Hiperaktivitas</strong> Ananda berada di kategori <span className="font-bold underline decoration-secondary-500 decoration-2 underline-offset-4">{getHyperStatus(scores.subScores.hiperaktivitas)}</span>. 
-                      Game Robo Mind akan mengadaptasikan tingkat kesulitan awal pada modul <em>Logika Robot</em> dan <em>Misi Matematika</em> untuk mengoptimalkan tingkat fokus dan interaksi spesifik ini.
+                      {lang === 'en' ? (
+                        <>
+                          Based on the early screening, your child's <strong>Attention &amp; Hyperactivity</strong> level is in the <span className="font-bold underline decoration-secondary-500 decoration-2 underline-offset-4">{getHyperStatus(scores.subScores.hiperaktivitas)}</span> category.
+                          Robo Mind games will adapt the initial difficulty of the <em>Robot Logic</em> and <em>Math Mission</em> modules to optimize this specific level of focus and interaction.
+                        </>
+                      ) : (
+                        <>
+                          Berdasarkan skrining awal, tingkat <strong>Atensi &amp; Hiperaktivitas</strong> Ananda berada di kategori <span className="font-bold underline decoration-secondary-500 decoration-2 underline-offset-4">{getHyperStatus(scores.subScores.hiperaktivitas)}</span>. 
+                          Game Robo Mind akan mengadaptasikan tingkat kesulitan awal pada modul <em>Logika Robot</em> dan <em>Misi Matematika</em> untuk mengoptimalkan tingkat fokus dan interaksi spesifik ini.
+                        </>
+                      )}
                     </p>
                   </div>
 
@@ -350,24 +425,24 @@ const ScreeningQuiz = () => {
                       <div className="p-2 bg-gradient-to-br from-secondary-400 to-secondary-600 rounded-lg text-white">
                         <Lock size={18} />
                       </div>
-                      <h4 className="text-xl font-bold font-fredoka text-white">Buka Potensi Penuh</h4>
+                      <h4 className="text-xl font-bold font-fredoka text-white">{T.unlockTitle}</h4>
                     </div>
                     
                     <p className="text-gray-300 font-outfit text-sm leading-relaxed mb-6 relative z-10">
-                      Ingin Laporan Analisis Mingguan Mendalam & Rekomendasi Aktivitas Nyata dari Psikolog Anak? Hubungkan Akun Game Anda dan Berlangganan Paket Premium SaaS Sekarang.
+                      {T.unlockBody}
                     </p>
                     
                     <button className="w-full relative z-10 flex items-center justify-center gap-2 py-3.5 px-4 rounded-xl font-bold text-gray-900 bg-gradient-to-r from-secondary-400 to-secondary-500 hover:from-secondary-300 hover:to-secondary-400 shadow-lg shadow-secondary-500/25 transition-all">
-                      Aktifkan Premium SaaS Analysis <ArrowRight size={18} />
+                      {T.unlockBtn} <ArrowRight size={18} />
                     </button>
                   </motion.div>
 
                   <div className="pt-2 flex flex-col sm:flex-row justify-center gap-3">
                     <Link to="/chatbot" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-50 text-primary-600 border border-primary-200 hover:bg-primary-100 hover:text-primary-700 rounded-xl font-bold shadow-sm transition-all">
-                      <Bot size={20} /> Konsultasi Hasil
+                      <Bot size={20} /> {T.consult}
                     </Link>
                     <Link to="/" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-gray-700 border border-gray-200 hover:bg-gray-50 hover:text-gray-900 rounded-xl font-bold shadow-sm transition-all">
-                      <CheckCircle2 size={20} className="text-emerald-500" /> Selesai & Kembali
+                      <CheckCircle2 size={20} className="text-emerald-500" /> {T.finish}
                     </Link>
                   </div>
 

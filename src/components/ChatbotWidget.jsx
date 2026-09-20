@@ -2,16 +2,25 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { Bot, X, Send } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
+import { useTranslation } from 'react-i18next';
+
+const GREETING = {
+  id: 'Halo! Saya asisten AI Robo Mind. Ingin bertanya tentang perkembangan anak Anda atau tips stimulasi belajar hari ini?',
+  en: "Hi! I'm the Robo Mind AI assistant. Want to ask about your child's development or today's learning stimulation tips?"
+};
 
 const ChatbotWidget = () => {
+  const { i18n } = useTranslation();
+  const lang = i18n.language === 'en' ? 'en' : 'id';
   const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([
-    { role: 'assistant', text: 'Halo! Saya asisten AI Robo Mind. Ingin bertanya tentang perkembangan anak Anda atau tips stimulasi belajar hari ini?' }
-  ]);
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const chatEndRef = useRef(null);
   const textareaRef = useRef(null);
+
+  // Greeting is derived so it always follows the selected language until the user starts chatting
+  const displayMessages = [{ role: 'assistant', text: GREETING[lang] }, ...messages];
 
   const autoResizeTextarea = useCallback(() => {
     const ta = textareaRef.current;
@@ -103,13 +112,13 @@ const ChatbotWidget = () => {
 
       // If no text was accumulated (non-streaming fallback or error)
       if (!accumulatedText) {
-        let fullText = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+        let fullText = lang === 'en' ? 'Sorry, something went wrong. Please try again.' : 'Maaf, terjadi kesalahan. Silakan coba lagi.';
         try {
           const data = await res.json();
           if (data.reply) fullText = data.reply;
-          else if (data.error) fullText = typeof data.error === 'string' ? data.error : 'Terjadi kesalahan pada server API.';
+          else if (data.error) fullText = typeof data.error === 'string' ? data.error : (lang === 'en' ? 'An error occurred on the API server.' : 'Terjadi kesalahan pada server API.');
         } catch {
-          if (!res.ok) fullText = 'Maaf, koneksi terputus. Silakan coba lagi.';
+          if (!res.ok) fullText = lang === 'en' ? 'Sorry, the connection was lost. Please try again.' : 'Maaf, koneksi terputus. Silakan coba lagi.';
         }
 
         // Animate fallback text char by char like typing
@@ -137,7 +146,7 @@ const ChatbotWidget = () => {
         if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
           newMsgs[lastIdx] = {
             ...newMsgs[lastIdx],
-            text: 'Maaf, koneksi terputus. Silakan coba lagi.',
+            text: lang === 'en' ? 'Sorry, the connection was lost. Please try again.' : 'Maaf, koneksi terputus. Silakan coba lagi.',
             isTyping: false
           };
         }
@@ -199,7 +208,7 @@ const ChatbotWidget = () => {
             </div>
             
             <div className="h-72 sm:h-80 bg-gray-50 p-4 overflow-y-auto flex flex-col gap-4">
-              {messages.map((msg, i) => (
+              {displayMessages.map((msg, i) => (
                 <div key={i} className={`flex gap-3 ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
                   {msg.role === 'assistant' && (
                     <div className="w-8 h-8 rounded-full bg-primary-100 flex items-center justify-center shrink-0">
@@ -239,7 +248,7 @@ const ChatbotWidget = () => {
                   onChange={(e) => setInput(e.target.value)}
                   onInput={autoResizeTextarea}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ketik pertanyaan Anda..." 
+                  placeholder={lang === 'en' ? 'Type your question...' : 'Ketik pertanyaan Anda...'} 
                   disabled={loading}
                   rows={1}
                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-2.5 pl-4 pr-12 text-sm font-outfit focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 disabled:opacity-50 resize-none overflow-hidden"

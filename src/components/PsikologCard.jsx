@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { MapPin, ExternalLink, BadgeCheck, Award, Navigation, Search } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const PSIKOLOG_DATA = [
   { nama: "RS PKU Muhammadiyah Surakarta", psikolog: "Moordiningsih", alamat: "RS PKU Muhammadiyah Surakarta, Jl. Ronggowarsito No. 130, Surakarta", telepon: "", jam: "", no_siap: "20050347", siap_status: "Aktif", no_sipp: "20050347-2023-02-3000", sipp_status: "Aktif", layanan: "Klinikal" },
@@ -19,10 +20,23 @@ const PSIKOLOG_DATA = [
   { nama: "Klinik Anak Cerdas Ceria", psikolog: "Rina Jayanti", alamat: "Klinik Anak Cerdas Ceria, Jl. Letjen Suprapto No.89, Banyuanyar, Surakarta", telepon: "", jam: "", no_siap: "20161248", siap_status: "Aktif", no_sipp: "20161248-2025-03-2074", sipp_status: "Aktif", layanan: "Anak, Keluarga, ABK, Dewasa, Pernikahan, Klinikal" },
 ];
 
+const LAYANAN_EN = {
+  'Pendidikan': 'Education',
+  'Anak': 'Children',
+  'Keluarga': 'Family',
+  'ABK': 'Special Needs',
+  'Dewasa': 'Adults',
+  'Lansia': 'Elderly',
+  'Pernikahan': 'Marriage',
+  'Industri': 'Industrial',
+  'Klinikal': 'Clinical',
+  'Industri & Organisasi': 'Industrial & Organizational',
+};
+
 const parsePsikologRekomendasi = (text) => {
   const match = text.match(/REKOMENDASI PSIKOLOG:\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)\s*\|\s*(.+?)$/m);
   if (!match) return null;
-  const [_, psikolog, nama, alamat, telepon] = match;
+  const [, psikolog, nama, alamat, telepon] = match;
   return { psikolog: psikolog.trim(), nama: nama.trim(), alamat: alamat.trim(), telepon: telepon.trim(), jam: '' };
 };
 
@@ -31,7 +45,20 @@ const cleanPsikologText = (text) => {
 };
 
 const PsikologCard = ({ data }) => {
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(data.alamat)}`;
+
+  const renderLayanan = (label) => {
+    const clean = label.trim();
+    if (!isEn) return clean;
+    return LAYANAN_EN[clean] || clean;
+  };
+
+  const statusLabel = (status) => {
+    if (!isEn) return status;
+    return status === 'Aktif' ? 'Active' : 'Inactive';
+  };
 
   return (
     <div className="bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
@@ -47,7 +74,7 @@ const PsikologCard = ({ data }) => {
             <div className="flex flex-wrap gap-1 mt-2">
               {data.layanan.split(',').map((l, i) => (
                 <span key={i} className="text-[10px] font-medium text-primary-700 bg-primary-50 px-2 py-0.5 rounded-full">
-                  {l.trim()}
+                  {renderLayanan(l)}
                 </span>
               ))}
             </div>
@@ -57,13 +84,13 @@ const PsikologCard = ({ data }) => {
             {data.no_siap && (
               <div className="flex items-center gap-2 text-xs text-gray-600">
                 <BadgeCheck size={14} className="shrink-0 text-green-500" />
-                <span>SIAP: <strong>{data.no_siap}</strong> {data.siap_status && <span className={`${data.siap_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({data.siap_status})</span>}</span>
+                <span>SIAP: <strong>{data.no_siap}</strong> {data.siap_status && <span className={`${data.siap_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({statusLabel(data.siap_status)})</span>}</span>
               </div>
             )}
             {data.no_sipp && (
               <div className="flex items-center gap-2 text-xs text-gray-600">
                 <Award size={14} className="shrink-0 text-amber-500" />
-                <span>SIPP: <strong>{data.no_sipp}</strong> {data.sipp_status && <span className={`${data.sipp_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({data.sipp_status})</span>}</span>
+                <span>SIPP: <strong>{data.no_sipp}</strong> {data.sipp_status && <span className={`${data.sipp_status === 'Aktif' ? 'text-green-600' : 'text-red-500'}`}>({statusLabel(data.sipp_status)})</span>}</span>
               </div>
             )}
             <div className="flex items-start gap-2 text-xs text-gray-600">
@@ -76,7 +103,7 @@ const PsikologCard = ({ data }) => {
             className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-primary-500 hover:bg-primary-600 px-3 py-2 rounded-xl transition-colors"
           >
             <ExternalLink size={14} />
-            Buka di Google Maps
+            {isEn ? 'Open in Google Maps' : 'Buka di Google Maps'}
           </a>
         </div>
       </div>
@@ -87,6 +114,8 @@ const PsikologCard = ({ data }) => {
 const ALL_KOTA = ['Surakarta', 'Solo', 'Jakarta', 'Bandung', 'Surabaya', 'Yogyakarta', 'Semarang', 'Medan', 'Makassar', 'Palembang', 'Denpasar', 'Malang', 'Tangerang', 'Bekasi', 'Depok', 'Bogor', 'Pekanbaru', 'Banjarmasin', 'Manado', 'Balikpapan', 'Padang', 'Lampung'];
 
 const PsikologFinder = () => {
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
   const [mode, setMode] = useState(null);
   const [kota, setKota] = useState('');
   const [filtered, setFiltered] = useState([]);
@@ -129,15 +158,15 @@ const PsikologFinder = () => {
   if (!mode) {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Cari Psikolog</p>
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">{isEn ? 'Find a Psychologist' : 'Cari Psikolog'}</p>
         <button onClick={checkLocation} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-white bg-primary-500 hover:bg-primary-600 px-4 py-2.5 rounded-xl transition-colors">
-          <Navigation size={16} /> Deteksi Lokasi Saya
+          <Navigation size={16} /> {isEn ? 'Detect My Location' : 'Deteksi Lokasi Saya'}
         </button>
-        <div className="flex items-center gap-2 my-3"><span className="flex-1 h-px bg-gray-200" /><span className="text-xs text-gray-400">atau</span><span className="flex-1 h-px bg-gray-200" /></div>
+        <div className="flex items-center gap-2 my-3"><span className="flex-1 h-px bg-gray-200" /><span className="text-xs text-gray-400">{isEn ? 'or' : 'atau'}</span><span className="flex-1 h-px bg-gray-200" /></div>
         <button onClick={() => setMode('manual')} className="w-full flex items-center justify-center gap-2 text-sm font-semibold text-gray-600 bg-gray-50 hover:bg-gray-100 border border-gray-200 px-4 py-2.5 rounded-xl transition-colors">
-          <Search size={16} /> Cari Manual
+          <Search size={16} /> {isEn ? 'Search Manually' : 'Cari Manual'}
         </button>
-        <p className="mt-3 text-[10px] text-gray-400">Data tersedia untuk Surakarta/Solo. Kota lain diarahkan ke HIMPSI.</p>
+        <p className="mt-3 text-[10px] text-gray-400">{isEn ? 'Data available for Surakarta/Solo. Other cities are redirected to HIMPSI.' : 'Data tersedia untuk Surakarta/Solo. Kota lain diarahkan ke HIMPSI.'}</p>
       </div>
     );
   }
@@ -145,16 +174,16 @@ const PsikologFinder = () => {
   if (mode === 'manual') {
     return (
       <div className="mt-3 bg-white border border-primary-100 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">Masukkan Nama Kota</p>
+        <p className="font-fredoka font-bold text-sm text-gray-800 mb-3">{isEn ? 'Enter City Name' : 'Masukkan Nama Kota'}</p>
         <div className="relative">
-          <input type="text" value={kota} onChange={handleManualInput} placeholder="Ketik nama kota..." className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10" />
+          <input type="text" value={kota} onChange={handleManualInput} placeholder={isEn ? 'Type a city name...' : 'Ketik nama kota...'} className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/10" />
           {showDropdown && filtered.length > 0 && (
             <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-30 max-h-48 overflow-y-auto">
               {filtered.map(k => <button key={k} type="button" onClick={() => selectKota(k)} className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-primary-50">{k}</button>)}
             </div>
           )}
         </div>
-        <button onClick={() => setMode(null)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">Kembali</button>
+        <button onClick={() => setMode(null)} className="mt-2 text-xs text-gray-400 hover:text-gray-600 underline">{isEn ? 'Back' : 'Kembali'}</button>
       </div>
     );
   }
@@ -162,10 +191,10 @@ const PsikologFinder = () => {
   if (mode === 'luar') {
     return (
       <div className="mt-3 bg-amber-50 border border-amber-200 rounded-2xl p-4 shadow-sm">
-        <p className="font-fredoka font-bold text-sm text-amber-800">Data belum tersedia</p>
-        <p className="text-xs text-amber-700 mt-1">Database saat ini hanya untuk Surakarta/Solo. Silakan cari di direktori HIMPSI.</p>
-        <a href="https://himpsi.or.id/cari-psikolog" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 px-3 py-2 rounded-xl">🔗 Cari di HIMPSI</a>
-        <button onClick={() => setMode(null)} className="block mt-2 text-xs text-amber-600 underline">Kembali</button>
+        <p className="font-fredoka font-bold text-sm text-amber-800">{isEn ? 'Data not available yet' : 'Data belum tersedia'}</p>
+        <p className="text-xs text-amber-700 mt-1">{isEn ? 'The database currently only covers Surakarta/Solo. Please search the HIMPSI directory.' : 'Database saat ini hanya untuk Surakarta/Solo. Silakan cari di direktori HIMPSI.'}</p>
+        <a href="https://himpsi.or.id/cari-psikolog" target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white bg-amber-600 hover:bg-amber-700 px-3 py-2 rounded-xl">🔗 {isEn ? 'Search on HIMPSI' : 'Cari di HIMPSI'}</a>
+        <button onClick={() => setMode(null)} className="block mt-2 text-xs text-amber-600 underline">{isEn ? 'Back' : 'Kembali'}</button>
       </div>
     );
   }
@@ -174,11 +203,11 @@ const PsikologFinder = () => {
     return (
       <div className="mt-3 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="font-fredoka font-bold text-sm text-gray-800">Psikolog di Surakarta ({PSIKOLOG_DATA.length})</p>
-          <button onClick={() => setMode(null)} className="text-xs text-gray-400 underline">Tutup</button>
+          <p className="font-fredoka font-bold text-sm text-gray-800">{isEn ? `Psychologists in Surakarta (${PSIKOLOG_DATA.length})` : `Psikolog di Surakarta (${PSIKOLOG_DATA.length})`}</p>
+          <button onClick={() => setMode(null)} className="text-xs text-gray-400 underline">{isEn ? 'Close' : 'Tutup'}</button>
         </div>
         {PSIKOLOG_DATA.map((p, i) => <PsikologCard key={i} data={p} />)}
-        <p className="text-[10px] text-gray-400">Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik.</p>
+        <p className="text-[10px] text-gray-400">{isEn ? 'Sourced from HIMPSI. Please reconfirm practice schedules.' : 'Data bersumber dari HIMPSI. Mohon konfirmasi ulang jadwal praktik.'}</p>
       </div>
     );
   }

@@ -23,6 +23,7 @@ ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, 
 
 const ParentDashboard = () => {
   const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);
@@ -360,7 +361,7 @@ const ParentDashboard = () => {
                 onClick={() => setShowAddChildModal(true)}
                 className="px-4 py-2 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs shadow-md transition-all active:scale-95 flex items-center gap-1.5"
               >
-                <span>➕ Tambah Anak Baru (Buat Kode Akses)</span>
+                <span>➕ {isEn ? 'Add New Child (Generate Access Code)' : 'Tambah Anak Baru (Buat Kode Akses)'}</span>
               </button>
             </div>
           {childrenList.length > 1 && (
@@ -478,11 +479,11 @@ const ParentDashboard = () => {
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">
-                  Aktivitas Terbaru ({activeChild.name})
+                  {isEn ? `Recent Activity (${activeChild.name})` : `Aktivitas Terbaru (${activeChild.name})`}
                 </h4>
                 {recentSessions.length > 5 && (
                   <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-100 dark:bg-cyan-950 px-2 py-0.5 rounded-md">
-                    Scroll untuk lihat semua ({recentSessions.length})
+                    {isEn ? `Scroll to see all (${recentSessions.length})` : `Scroll untuk lihat semua (${recentSessions.length})`}
                   </span>
                 )}
               </div>
@@ -512,23 +513,23 @@ const ParentDashboard = () => {
                     }
 
                     // Format timestamp cleanly without double-shifting ISO string
-                    let timeFormatted = 'Baru saja';
+                    let timeFormatted = isEn ? 'Just now' : 'Baru saja';
                     const rawTime = s.completed_at || s.created_at;
                     if (rawTime) {
                       try {
                         const dateObj = new Date(rawTime);
                         if (!isNaN(dateObj.getTime())) {
-                          // Format in Indonesian locale
-                          const datePart = dateObj.toLocaleDateString('id-ID', {
+                          // Format according to selected language
+                          const datePart = dateObj.toLocaleDateString(isEn ? 'en-US' : 'id-ID', {
                             day: 'numeric',
                             month: 'short'
                           });
-                          const timePart = dateObj.toLocaleTimeString('id-ID', {
+                          const timePart = dateObj.toLocaleTimeString(isEn ? 'en-US' : 'id-ID', {
                             hour: '2-digit',
                             minute: '2-digit',
                             hour12: false
                           }).replace('.', ':');
-                          timeFormatted = `${datePart}, ${timePart} WIB`;
+                          timeFormatted = isEn ? `${datePart}, ${timePart}` : `${datePart}, ${timePart} WIB`;
                         }
                       } catch (e) {}
                     }
@@ -556,7 +557,7 @@ const ParentDashboard = () => {
                   })
                 ) : (
                   <div className="text-center py-4 px-3 rounded-xl bg-gray-50 dark:bg-slate-900/40 border border-dashed border-gray-200 dark:border-slate-700 text-xs text-gray-400">
-                    Belum ada sesi bermain hari ini. Mainkan game untuk mencatat kemajuan!
+                    {isEn ? 'No play sessions today yet. Play a game to record progress!' : 'Belum ada sesi bermain hari ini. Mainkan game untuk mencatat kemajuan!'}
                   </div>
                 )}
               </div>
@@ -570,7 +571,7 @@ const ParentDashboard = () => {
                 🧠 Prefrontal Cortex (PFC) Analysis
               </span>
               <h4 className="text-base font-extrabold text-gray-900 dark:text-white mt-1 font-fredoka">
-                Analisis Fungsi Eksekutif Otak ({activeChild.name})
+                {isEn ? `Executive Function Brain Analysis (${activeChild.name})` : `Analisis Fungsi Eksekutif Otak (${activeChild.name})`}
               </h4>
             </div>
 
@@ -591,11 +592,11 @@ const ParentDashboard = () => {
 
               // Calculate dominant PFC strength & brain archetype
               const pfcScores = [
-                { name: 'Working Memory (Logika)', score: skills.logic, key: 'logic', color: 'from-cyan-500 to-blue-500', games: 'Robot Circuit, Energy Core, Robo Link' },
-                { name: 'Cognitive Flexibility (Kreativitas)', score: skills.creativity, key: 'creativity', color: 'from-amber-500 to-orange-500', games: 'Robot Escape, Robo Charge, Robo Maze' },
-                { name: 'Language & Literacy', score: skills.literacy, key: 'literacy', color: 'from-purple-500 to-indigo-500', games: 'Robo Link, Word Puzzle' },
-                { name: 'Inhibitory Control & Focus', score: skills.focus, key: 'focus', color: 'from-emerald-500 to-teal-500', games: 'Screw Spin, Robo Circle, Rogue Soul' },
-                { name: 'Moral Reasoning & Empathy', score: skills.moral, key: 'moral', color: 'from-rose-500 to-pink-500', games: 'Robo-Jek, Pick and Drop' },
+                { name: isEn ? 'Working Memory (Logic)' : 'Working Memory (Logika)', score: skills.logic, key: 'logic', color: 'from-cyan-500 to-blue-500', games: 'Robot Circuit, Energy Core, Robo Link' },
+                { name: isEn ? 'Cognitive Flexibility (Creativity)' : 'Cognitive Flexibility (Kreativitas)', score: skills.creativity, key: 'creativity', color: 'from-amber-500 to-orange-500', games: 'Robot Escape, Robo Charge, Robo Maze' },
+                { name: isEn ? 'Language & Literacy' : 'Language & Literacy', score: skills.literacy, key: 'literacy', color: 'from-purple-500 to-indigo-500', games: 'Robo Link, Word Puzzle' },
+                { name: isEn ? 'Inhibitory Control & Focus' : 'Inhibitory Control & Focus', score: skills.focus, key: 'focus', color: 'from-emerald-500 to-teal-500', games: 'Screw Spin, Robo Circle, Rogue Soul' },
+                { name: isEn ? 'Moral Reasoning & Empathy' : 'Moral Reasoning & Empathy', score: skills.moral, key: 'moral', color: 'from-rose-500 to-pink-500', games: 'Robo-Jek, Pick and Drop' },
               ];
 
               const sorted = [...pfcScores].sort((a, b) => b.score - a.score);
@@ -603,32 +604,48 @@ const ParentDashboard = () => {
               const lowestPfc = sorted[sorted.length - 1];
 
               let archetypeTitle = "🚀 Strategic Problem Solver";
-              let archetypeDesc = "Memiliki keseimbangan logika spasial dan daya pemecahan masalah yang baik.";
+              let archetypeDesc = isEn
+                ? "Has a good balance of spatial logic and problem-solving skills."
+                : "Memiliki keseimbangan logika spasial dan daya pemecahan masalah yang baik.";
 
               if (topPfc.key === 'logic') {
                 archetypeTitle = "🧩 Strategic Logic Thinker";
-                archetypeDesc = `Sangat menonjol dalam logika berurutan, Working Memory, dan pemecahan masalah puzzle.`;
+                archetypeDesc = isEn
+                  ? "Stands out in sequential logic, Working Memory, and puzzle problem-solving."
+                  : `Sangat menonjol dalam logika berurutan, Working Memory, dan pemecahan masalah puzzle.`;
               } else if (topPfc.key === 'focus') {
                 archetypeTitle = "🎯 High-Focus Tactician";
-                archetypeDesc = `Unggul dalam Inhibitory Control (kontrol impuls), ketahanan fokus, dan respons refleks cepat.`;
+                archetypeDesc = isEn
+                  ? "Excels in inhibitory control, focus endurance, and fast reflex responses."
+                  : `Unggul dalam Inhibitory Control (kontrol impuls), ketahanan fokus, dan respons refleks cepat.`;
               } else if (topPfc.key === 'creativity') {
                 archetypeTitle = "🔄 Flexible Adaptor & Creator";
-                archetypeDesc = `Memiliki Fleksibilitas Kognitif tinggi, mampu beradaptasi cepat saat tantangan dan aturan berubah.`;
+                archetypeDesc = isEn
+                  ? "Has high cognitive flexibility and adapts quickly when challenges and rules change."
+                  : `Memiliki Fleksibilitas Kognitif tinggi, mampu beradaptasi cepat saat tantangan dan aturan berubah.`;
               } else if (topPfc.key === 'moral') {
                 archetypeTitle = "🤝 Empathic Social Leader";
-                archetypeDesc = `Unggul dalam pertimbangan etis, empati sosial, dan pemahaman dampak sosial dari suatu tindakan.`;
+                archetypeDesc = isEn
+                  ? "Excels in ethical reasoning, social empathy, and understanding the social impact of actions."
+                  : `Unggul dalam pertimbangan etis, empati sosial, dan pemahaman dampak sosial dari suatu tindakan.`;
               } else if (topPfc.key === 'literacy') {
                 archetypeTitle = "📚 Linguistic Conceptualizer";
-                archetypeDesc = `Kuat dalam pengenalan pola bahasa, memori verbal, serta penyampaian konsep.`;
+                archetypeDesc = isEn
+                  ? "Strong in language pattern recognition, verbal memory, and conveying concepts."
+                  : `Kuat dalam pengenalan pola bahasa, memori verbal, serta penyampaian konsep.`;
               }
 
               // Dynamic text based on actual played games
               const playedText = playedGameTitles.length > 0
-                ? `Game yang aktif dimainkan: ${playedGameTitles.slice(0, 3).join(', ')}.`
-                : 'Belum ada game yang selesai dimainkan hari ini.';
+                ? (isEn
+                    ? `Games actively played: ${playedGameTitles.slice(0, 3).join(', ')}.`
+                    : `Game yang aktif dimainkan: ${playedGameTitles.slice(0, 3).join(', ')}.`)
+                : (isEn ? 'No games completed today yet.' : 'Belum ada game yang selesai dimainkan hari ini.');
 
               const lastPlayNote = lastGameTitle
-                ? `Terakhir kali ${activeChild.name} menyelesaikan sesi game ${lastGameTitle}.`
+                ? (isEn
+                    ? `Last time ${activeChild.name} completed the ${lastGameTitle} game session.`
+                    : `Terakhir kali ${activeChild.name} menyelesaikan sesi game ${lastGameTitle}.`)
                 : '';
 
               return (
@@ -636,8 +653,8 @@ const ParentDashboard = () => {
                   {/* Layer 2: Brain Archetype Badge */}
                   <div className="p-3.5 rounded-2xl bg-gradient-to-r from-cyan-950/40 via-slate-900 to-slate-900 border border-cyan-500/30 text-left">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] font-black uppercase text-cyan-400">Profil Karakter Otak (PFC Profile)</span>
-                      <span className="text-xs font-bold text-amber-400">Skor Utama: {topPfc.score}%</span>
+                      <span className="text-[10px] font-black uppercase text-cyan-400">{isEn ? 'Brain Character Profile (PFC Profile)' : 'Profil Karakter Otak (PFC Profile)'}</span>
+                      <span className="text-xs font-bold text-amber-400">{isEn ? 'Main Score' : 'Skor Utama'}: {topPfc.score}%</span>
                     </div>
                     <div className="font-extrabold text-sm text-white flex items-center gap-1.5">
                       <span>{archetypeTitle}</span>
@@ -650,17 +667,17 @@ const ParentDashboard = () => {
                   {/* Layer 3: Actionable AI Insight */}
                   <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900/80 border border-gray-200 dark:border-slate-700 text-left text-xs space-y-1.5">
                     <div className="flex items-center justify-between font-bold text-gray-800 dark:text-gray-200">
-                      <span>💡 <b>Analisis Pendampingan AI untuk Orang Tua:</b></span>
-                      <span className="text-[9px] text-cyan-600 dark:text-cyan-400 font-normal">Real-Time Adaptif</span>
+                      <span>💡 <b>{isEn ? 'AI Parental Coaching Analysis:' : 'Analisis Pendampingan AI untuk Orang Tua:'}</b></span>
+                      <span className="text-[9px] text-cyan-600 dark:text-cyan-400 font-normal">{isEn ? 'Adaptive Real-Time' : 'Real-Time Adaptif'}</span>
                     </div>
                     <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
-                      • <b>Fokus Permainan:</b> {playedText} {lastPlayNote}
+                      • <b>{isEn ? 'Play Focus:' : 'Fokus Permainan:'}</b> {playedText} {lastPlayNote}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
-                      • <b>Pilar PFC Dominan:</b> Area <span className="text-emerald-600 dark:text-emerald-400 font-bold">{topPfc.name} ({topPfc.score}%)</span> berkembang paling baik.
+                      • <b>{isEn ? 'Dominant PFC Pillar:' : 'Pilar PFC Dominan:'}</b> {isEn ? 'The' : 'Area'} <span className="text-emerald-600 dark:text-emerald-400 font-bold">{topPfc.name} ({topPfc.score}%)</span> {isEn ? 'area is developing best.' : 'berkembang paling baik.'}
                     </p>
                     <p className="text-gray-600 dark:text-gray-300 text-[11px] leading-relaxed">
-                      • <b>Saran Penguatan:</b> Untuk menyeimbangkan pilar <span className="text-cyan-600 dark:text-cyan-400 font-bold">{lowestPfc.name} ({lowestPfc.score}%)</span>, berikan kesempatan {activeChild.name} mencoba game <i>{lowestPfc.games}</i>.
+                      • <b>{isEn ? 'Strengthening Suggestion:' : 'Saran Penguatan:'}</b> {isEn ? 'To balance the' : 'Untuk menyeimbangkan pilar'} <span className="text-cyan-600 dark:text-cyan-400 font-bold">{lowestPfc.name} ({lowestPfc.score}%)</span>{isEn ? ` pillar, give ${activeChild.name} a chance to try the` : `, berikan kesempatan ${activeChild.name} mencoba game`} <i>{lowestPfc.games}</i>{isEn ? ' games.' : '.'}
                     </p>
                   </div>
                 </div>
@@ -686,16 +703,16 @@ const ParentDashboard = () => {
               <div className="w-12 h-12 rounded-2xl bg-cyan-100 dark:bg-cyan-950 text-cyan-600 dark:text-cyan-400 flex items-center justify-center mx-auto mb-2 text-2xl">
                 👶
               </div>
-              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka">Tambah Profil Anak</h3>
-              <p className="text-xs text-gray-500 dark:text-gray-400">Sistem akan membuatkan 8-digit Kode Akses Game secara otomatis</p>
+              <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka">{isEn ? 'Add Child Profile' : 'Tambah Profil Anak'}</h3>
+              <p className="text-xs text-gray-500 dark:text-gray-400">{isEn ? 'The system will automatically generate an 8-digit Game Access Code' : 'Sistem akan membuatkan 8-digit Kode Akses Game secara otomatis'}</p>
             </div>
 
             <form onSubmit={handleCreateChildProfile} className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Nama Panggilan Anak</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">{isEn ? "Child's Nickname" : 'Nama Panggilan Anak'}</label>
                 <input
                   type="text"
-                  placeholder="Contoh: Kenzo, Aira, Rafa..."
+                  placeholder={isEn ? 'Example: Kenzo, Aira, Rafa...' : 'Contoh: Kenzo, Aira, Rafa...'}
                   value={newChildName}
                   onChange={e => setNewChildName(e.target.value)}
                   required
@@ -704,7 +721,7 @@ const ParentDashboard = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">Usia Anak (Tahun)</label>
+                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-1">{isEn ? "Child's Age (Years)" : 'Usia Anak (Tahun)'}</label>
                 <input
                   type="number"
                   min="3"
@@ -720,7 +737,7 @@ const ParentDashboard = () => {
                 type="submit"
                 className="w-full py-3 bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95"
               >
-                Buat Profil & Generate Kode Akses
+                {isEn ? 'Create Profile & Generate Access Code' : 'Buat Profil & Generate Kode Akses'}
               </button>
             </form>
           </div>
@@ -735,14 +752,14 @@ const ParentDashboard = () => {
               🎉
             </div>
             <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka mb-1">
-              Profil "{createdCodeAlert.name}" Berhasil Dibuat!
+              {isEn ? `Profile "${createdCodeAlert.name}" Created Successfully!` : `Profil "${createdCodeAlert.name}" Berhasil Dibuat!`}
             </h3>
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-4">
-              Berikan Kode Akses 8-Digit ini kepada anak untuk masuk di Aplikasi Game:
+              {isEn ? 'Give this 8-digit Access Code to your child to sign in to the Game App:' : 'Berikan Kode Akses 8-Digit ini kepada anak untuk masuk di Aplikasi Game:'}
             </p>
 
             <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 mb-4">
-              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 block mb-1">🔑 KODE AKSES GAME</span>
+              <span className="text-xs font-bold text-gray-500 dark:text-gray-400 block mb-1">🔑 {isEn ? 'GAME ACCESS CODE' : 'KODE AKSES GAME'}</span>
               <span className="font-mono font-black text-2xl text-cyan-600 dark:text-cyan-400 tracking-widest">
                 {createdCodeAlert.code.slice(0, 4)} - {createdCodeAlert.code.slice(4)}
               </span>
@@ -751,12 +768,12 @@ const ParentDashboard = () => {
             <button
               onClick={() => {
                 navigator.clipboard.writeText(createdCodeAlert.code);
-                alert('✅ Kode Akses disalin ke clipboard!');
+                alert(isEn ? '✅ Access Code copied to clipboard!' : '✅ Kode Akses disalin ke clipboard!');
                 setCreatedCodeAlert(null);
               }}
               className="w-full py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-extrabold text-xs rounded-xl shadow-md transition-all active:scale-95"
             >
-              Salin Kode & Selesai
+              {isEn ? 'Copy Code & Finish' : 'Salin Kode & Selesai'}
             </button>
           </div>
         </div>

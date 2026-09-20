@@ -1,17 +1,26 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
-import { Bot, User, Send, ArrowLeft, Loader2, Paperclip, Mic, X, Image as ImageIcon, FileText, Play, Camera } from 'lucide-react';
+import { Bot, User, Send, ArrowLeft, Paperclip, Mic, X, Image as ImageIcon, FileText, Play, Camera } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import ReactMarkdown from 'react-markdown';
-import { generateChatResponse, generateVisionChatResponse } from '../services/api';
+import { useTranslation } from 'react-i18next';
+import { generateVisionChatResponse } from '../services/api';
 import { PsikologFinder, cleanPsikologText } from '../components/PsikologCard';
 
+const GREETING = {
+  id: 'Halo! Saya asisten AI Robo Mind. Ingin bertanya tentang perkembangan kognitif anak Anda atau tips stimulasi belajar logika hari ini?',
+  en: "Hi! I'm the Robo Mind AI assistant. Want to ask about your child's cognitive development or today's logic learning stimulation tips?"
+};
+
 const ChatbotPage = () => {
-  const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Halo! Saya asisten AI Robo Mind. Ingin bertanya tentang perkembangan kognitif anak Anda atau tips stimulasi belajar logika hari ini?' }
-  ]);
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  // Greeting is derived so it always follows the selected language until the user starts chatting
+  const displayMessages = [{ role: 'assistant', content: GREETING[isEn ? 'en' : 'id'] }, ...messages];
   
   // New States for Voice & File
   const [selectedFile, setSelectedFile] = useState(null);
@@ -72,12 +81,12 @@ const ChatbotPage = () => {
       // Start recording with Web Speech API
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
-        alert('Browser Anda tidak mendukung input suara. Silakan gunakan Chrome atau Edge.');
+        alert(isEn ? 'Your browser does not support voice input. Please use Chrome or Edge.' : 'Browser Anda tidak mendukung input suara. Silakan gunakan Chrome atau Edge.');
         return;
       }
 
       const recognition = new SpeechRecognition();
-      recognition.lang = 'id-ID';
+      recognition.lang = isEn ? 'en-US' : 'id-ID';
       recognition.continuous = true;
       recognition.interimResults = true;
 
@@ -266,13 +275,13 @@ const ChatbotPage = () => {
 
         // Fallback typewriter if stream failed or empty
         if (!accumulatedText) {
-          let fullText = 'Maaf, terjadi kesalahan. Silakan coba lagi.';
+          let fullText = isEn ? 'Sorry, something went wrong. Please try again.' : 'Maaf, terjadi kesalahan. Silakan coba lagi.';
           try {
             const data = await res.json();
             if (data.reply) fullText = data.reply;
-            else if (data.error) fullText = typeof data.error === 'string' ? data.error : 'Terjadi kesalahan pada server API.';
+            else if (data.error) fullText = typeof data.error === 'string' ? data.error : (isEn ? 'An error occurred on the API server.' : 'Terjadi kesalahan pada server API.');
           } catch {
-            if (!res.ok) fullText = 'Maaf, koneksi terputus. Silakan coba lagi.';
+            if (!res.ok) fullText = isEn ? 'Sorry, the connection was lost. Please try again.' : 'Maaf, koneksi terputus. Silakan coba lagi.';
           }
 
           for (let i = 1; i <= fullText.length; i++) {
@@ -301,7 +310,7 @@ const ChatbotPage = () => {
         if (lastIdx >= 0 && newMsgs[lastIdx].role === 'assistant') {
           newMsgs[lastIdx] = {
             ...newMsgs[lastIdx],
-            content: 'Maaf, koneksi terputus. Silakan coba lagi.',
+            content: isEn ? 'Sorry, the connection was lost. Please try again.' : 'Maaf, koneksi terputus. Silakan coba lagi.',
             isTyping: false
           };
         }
@@ -342,7 +351,7 @@ const ChatbotPage = () => {
                 <span className="font-fredoka text-xl font-bold text-gray-800 tracking-wide block leading-tight">
                   Robo <span className="text-primary-500">Mind</span> AI
                 </span>
-                <span className="text-xs text-gray-500 font-medium">Asisten Edukasi Anak</span>
+                <span className="text-xs text-gray-500 font-medium">{isEn ? 'Child Education Assistant' : 'Asisten Edukasi Anak'}</span>
               </div>
             </div>
           </div>
@@ -361,7 +370,7 @@ const ChatbotPage = () => {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-6 pb-4 scroll-smooth z-10 pr-2">
-          {messages.map((msg, idx) => (
+          {displayMessages.map((msg, idx) => (
             <motion.div 
               key={idx}
               initial={{ opacity: 0, y: 10 }}
@@ -472,7 +481,7 @@ const ChatbotPage = () => {
                 <div className="flex items-center gap-3">
                   <span className="w-3 h-3 rounded-full bg-red-500 animate-pulse shrink-0"></span>
                   <span className="text-red-600 font-bold font-outfit">{formatTime(recordingTime)}</span>
-                  <span className="text-red-500/70 text-sm hidden sm:inline font-medium">Mendengarkan...</span>
+                  <span className="text-red-500/70 text-sm hidden sm:inline font-medium">{isEn ? 'Listening...' : 'Mendengarkan...'}</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <button 
@@ -499,7 +508,7 @@ const ChatbotPage = () => {
               )}
               {!transcript && (
                 <div className="mt-3 text-sm text-gray-400 italic bg-white/50 rounded-xl p-3 text-center">
-                  Bicaralah sekarang...
+                  {isEn ? 'Speak now...' : 'Bicaralah sekarang...'}
                 </div>
               )}
             </motion.div>
@@ -532,7 +541,7 @@ const ChatbotPage = () => {
                           <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0">
                             <Camera size={16} />
                           </div>
-                          Buka Kamera
+                          {isEn ? 'Open Camera' : 'Buka Kamera'}
                         </button>
                         <button 
                           type="button"
@@ -542,7 +551,7 @@ const ChatbotPage = () => {
                           <div className="w-8 h-8 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center shrink-0">
                             <ImageIcon size={16} />
                           </div>
-                          Pilih File / Galeri
+                          {isEn ? 'Choose File / Gallery' : 'Pilih File / Galeri'}
                         </button>
                       </motion.div>
                     )}
@@ -576,7 +585,7 @@ const ChatbotPage = () => {
                       handleSend(e);
                     }
                   }}
-                  placeholder="Ketik pesan..." 
+                  placeholder={isEn ? 'Type a message...' : 'Ketik pesan...'} 
                   rows={1}
                   className="w-full bg-gray-50 border border-gray-200 rounded-2xl py-4 pl-12 md:pl-14 pr-24 md:text-base text-sm font-outfit focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10 focus:bg-white transition-all shadow-inner resize-none overflow-hidden"
                 />
@@ -605,7 +614,7 @@ const ChatbotPage = () => {
           )}
 
           <div className="text-center mt-3 text-xs text-gray-400 font-outfit px-4">
-            AI dapat memberikan informasi yang kurang tepat. Harap pertimbangkan dengan bijak.
+            {isEn ? 'AI may provide inaccurate information. Please use your own judgment.' : 'AI dapat memberikan informasi yang kurang tepat. Harap pertimbangkan dengan bijak.'}
           </div>
         </div>
       </div>

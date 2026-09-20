@@ -1,10 +1,13 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 
 const GameAppPage = () => {
   const { user, session, loading } = useAuth();
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
 
   useEffect(() => {
     if (!loading && !user) {
@@ -17,7 +20,7 @@ const GameAppPage = () => {
       <div className="w-screen h-screen bg-[#050a16] flex items-center justify-center text-cyan-400 font-bold">
         <div className="flex flex-col items-center gap-3">
           <div className="w-10 h-10 border-4 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
-          <span>Memuat Sesi Bermain...</span>
+          <span>{isEn ? 'Loading Play Session...' : 'Memuat Sesi Bermain...'}</span>
         </div>
       </div>
     );
