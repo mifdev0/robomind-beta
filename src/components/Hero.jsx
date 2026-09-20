@@ -83,14 +83,16 @@ const Hero = () => {
                 {i18n.language === 'en' ? 'Community' : 'Komunitas'}
               </MotionLink>
 
-              <MotionLink
+              <motion.a
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                to="/download"
+                href="https://robomind-coba.vercel.app/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/30 transition-all cursor-pointer"
               >
                 {i18n.language === 'en' ? 'Play Now' : 'Mainkan Sekarang'}
-              </MotionLink>
+              </motion.a>
             </div>
           </div>
         </motion.div>
