@@ -7,48 +7,48 @@ const ModuleSection = () => {
   const modules = [
     {
       id: 1,
-      title: i18n.language === 'en' ? "Introduction to Robotics" : "Pengenalan Robotika",
-      description: i18n.language === 'en' ? "Basic module to understand what robots are and how they work in the real world." : "Modul dasar untuk memahami apa itu robot dan bagaimana mereka bekerja di dunia nyata.",
+      title: i18n.language === 'en' ? "Intro to Logic & Robotics" : "Pengenalan Logika & Robotika",
+      description: i18n.language === 'en' ? "Starter module: understand robots, simple instructions, and step-by-step sequences through Robo Mind mini-games." : "Modul dasar: memahami robot, instruksi sederhana, dan urutan langkah lewat mini-game Robo Mind.",
       price: i18n.language === 'en' ? "Free" : "Gratis",
       img: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=800&auto=format&fit=crop&q=80",
       isLocked: false,
     },
     {
       id: 2,
-      title: i18n.language === 'en' ? "Basic Programming Logic" : "Logika Pemrograman Dasar",
-      description: i18n.language === 'en' ? "Learn to think like a programmer with simple logic exercises." : "Pelajari cara berpikir layaknya seorang programmer dengan latihan logika sederhana.",
+      title: i18n.language === 'en' ? "Circuits & Logic Reasoning" : "Sirkuit & Penalaran Logika",
+      description: i18n.language === 'en' ? "Train working memory and problem solving by connecting circuits, managing energy, and linking data paths." : "Latih working memory dan pemecahan masalah dengan menyambung sirkuit, mengatur energi, dan menghubungkan jalur data.",
       price: i18n.language === 'en' ? "Free" : "Gratis",
-      img: "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&auto=format&fit=crop&q=80",
+      img: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=800&auto=format&fit=crop&q=80",
       isLocked: false,
     },
     {
       id: 3,
-      title: i18n.language === 'en' ? "Algorithm Exploration" : "Eksplorasi Algoritma",
-      description: i18n.language === 'en' ? "Understand algorithm concepts by compiling systematic steps through games." : "Pahami konsep algoritma dengan menyusun langkah-langkah sistematis melalui game.",
+      title: i18n.language === 'en' ? "Language Literacy & AI Concepts" : "Literasi Bahasa & Konsep AI",
+      description: i18n.language === 'en' ? "Build vocabulary and conceptual understanding through word games and interactive language puzzles." : "Membangun kosakata dan pemahaman konsep melalui permainan kata dan teka-teki bahasa interaktif.",
       price: i18n.language === 'en' ? "Free" : "Gratis",
-      img: "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=800&auto=format&fit=crop&q=80",
+      img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&auto=format&fit=crop&q=80",
       isLocked: false,
     },
     {
       id: 4,
-      title: i18n.language === 'en' ? "Block Programming Basics" : "Dasar Pemrograman Block",
-      description: i18n.language === 'en' ? "Learn basic algorithm concepts using interactive block programming." : "Pelajari konsep dasar algoritma dengan menggunakan block programming yang interaktif.",
+      title: i18n.language === 'en' ? "Focus & Self-Control" : "Fokus & Kontrol Diri",
+      description: i18n.language === 'en' ? "Strengthen inhibitory control, rhythm, and timing accuracy through fast-paced attention games." : "Melatih inhibitory control, ritme, dan ketepatan timing lewat game atensi yang cepat (Screw Spin, Robo Circle).",
       price: "Rp 50.000",
       img: "https://images.unsplash.com/photo-1515879218367-8466d910aaa4?w=800&auto=format&fit=crop&q=80",
       isLocked: false,
     },
     {
       id: 5,
-      title: i18n.language === 'en' ? "Simple Animation" : "Animasi Sederhana",
-      description: i18n.language === 'en' ? "Create your first animation and understand how frame by frame works in games." : "Buat animasi pertamamu dan pahami bagaimana frame by frame bekerja dalam game.",
+      title: i18n.language === 'en' ? "Visual-Spatial & Motor Skills" : "Spasial Visual & Motorik",
+      description: i18n.language === 'en' ? "Develop hand-eye coordination and spatial orientation through mazes and 3D challenge games." : "Mengembangkan koordinasi mata-tangan dan orientasi ruang lewat labirin dan game tantangan 3D.",
       price: "Rp 75.000",
       img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80",
       isLocked: false,
     },
     {
       id: 6,
-      title: i18n.language === 'en' ? "Advanced Logic & Basic AI" : "Logika Lanjutan & AI Dasar",
-      description: i18n.language === 'en' ? "Premium module that teaches basic AI concepts and complex logic for 3D games." : "Modul premium yang mengajarkan konsep AI dasar dan logika kompleks untuk game 3D.",
+      title: i18n.language === 'en' ? "Strategy, Empathy & Advanced AI" : "Strategi, Empati & AI Lanjutan",
+      description: i18n.language === 'en' ? "Premium module for ethical reasoning, social empathy, and advanced logic in complex strategy games." : "Modul premium untuk penalaran etis, empati sosial, dan logika tingkat lanjut dalam game strategi kompleks.",
       price: i18n.language === 'en' ? "Subscription" : "Berlangganan",
       img: "https://images.unsplash.com/photo-1677442136019-21780ecad995?w=800&auto=format&fit=crop&q=80",
       isLocked: true,
@@ -94,7 +94,7 @@ const ModuleSection = () => {
             {i18n.language === 'en' ? 'Learning Modules' : 'Modul Pembelajaran'}
           </h2>
           <p className="mt-3 sm:mt-4 text-sm sm:text-base md:text-lg text-gray-600 font-outfit max-w-2xl mx-auto px-2">
-            {i18n.language === 'en' ? 'Improve your child\'s logic and creativity through interactive modules specially designed for fun learning.' : 'Tingkatkan kemampuan logika dan kreativitas anak melalui modul-modul interaktif yang dirancang khusus untuk pembelajaran menyenangkan.'}
+            {i18n.language === 'en' ? 'Interactive modules that train your child\'s logic, focus, language, and spatial skills — aligned with Robo Mind neuro-games.' : 'Modul interaktif yang melatih logika, fokus, bahasa, dan spasial anak — selaras dengan neuro-game Robo Mind.'}
           </p>
         </motion.div>
 
