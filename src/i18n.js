@@ -70,15 +70,53 @@ const resources = {
   }
 };
 
+const LANG_STORAGE_KEY = 'robomind_lang';
+
+// Restore the last language chosen by the user so it survives page reloads / full navigations
+const getInitialLanguage = () => {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const saved = window.localStorage.getItem(LANG_STORAGE_KEY);
+      if (saved === 'en' || saved === 'id') return saved;
+    }
+  } catch (e) {
+    // ignore storage access errors
+  }
+  return 'id';
+};
+
 i18n
   .use(initReactI18next)
   .init({
     resources,
-    lng: "id", // default language
+    lng: getInitialLanguage(), // default language (or last saved)
     fallbackLng: "en",
     interpolation: {
       escapeValue: false
     }
   });
+
+// Persist the selected language and keep <html lang> in sync
+i18n.on('languageChanged', (lng) => {
+  const normalized = lng === 'en' ? 'en' : 'id';
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.setItem(LANG_STORAGE_KEY, normalized);
+    }
+    if (typeof document !== 'undefined') {
+      document.documentElement.lang = normalized;
+    }
+  } catch (e) {
+    // ignore storage access errors
+  }
+});
+
+try {
+  if (typeof document !== 'undefined') {
+    document.documentElement.lang = i18n.language === 'en' ? 'en' : 'id';
+  }
+} catch (e) {
+  // ignore
+}
 
 export default i18n;

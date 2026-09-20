@@ -1,5 +1,8 @@
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+
+const MotionLink = motion.create(Link);
 
 const Hero = () => {
   const { i18n } = useTranslation();
@@ -52,42 +55,42 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col gap-2.5 w-full max-w-[280px] mx-auto sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4 sm:max-w-none sm:mx-0 px-4 sm:px-0">
-            <motion.a
+            <MotionLink
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="/screening"
+              to="/screening"
               className="w-full sm:w-auto inline-flex justify-center items-center bg-white text-black px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-gray-200 transition-colors shadow-lg"
             >
               {i18n.language === 'en' ? 'Try Early Screening' : 'Coba Skrining Awal'}
-            </motion.a>
+            </MotionLink>
 
-            <motion.a
+            <MotionLink
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              href="/chatbot"
+              to="/chatbot"
               className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/15 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/25 backdrop-blur-sm transition-colors"
             >
               {i18n.language === 'en' ? 'Ask Chatbot' : 'Tanya Chatbot'}
-            </motion.a>
+            </MotionLink>
 
             <div className="flex flex-col gap-2.5 w-full sm:flex-row sm:gap-4 sm:w-auto sm:justify-center">
-              <motion.a
+              <MotionLink
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="/community"
+                to="/community"
                 className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-white/15 border border-white/30 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:bg-white/25 backdrop-blur-sm transition-colors"
               >
                 {i18n.language === 'en' ? 'Community' : 'Komunitas'}
-              </motion.a>
+              </MotionLink>
 
-              <motion.a
+              <MotionLink
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                href="/download"
+                to="/download"
                 className="w-full sm:w-auto inline-flex justify-center items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-3 rounded-full font-bold text-xs sm:text-base hover:from-cyan-400 hover:to-blue-500 shadow-lg shadow-cyan-500/30 transition-all cursor-pointer"
               >
                 {i18n.language === 'en' ? 'Play Now' : 'Mainkan Sekarang'}
-              </motion.a>
+              </MotionLink>
             </div>
           </div>
         </motion.div>
