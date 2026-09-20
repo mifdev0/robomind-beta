@@ -129,6 +129,28 @@ const GameSlider = () => {
         : 'Penjelajahan labirin multi-dimensi dengan navigasi topologi dan kunci komputasi.',
       video: '/robo_maze_preview.mp4',
       poster: '/rbt_maze.png'
+    },
+    {
+      id: 'robo-pose',
+      category: i18n.language === 'en' ? 'Motor Skills & AI' : 'Motorik & AI Kamera',
+      categoryColor: 'from-pink-500 to-rose-600',
+      title: 'ROBO POSE: GERAK CERDAS',
+      subtitle: i18n.language === 'en'
+        ? 'Hand-gesture and body-pose imitation training attention, motor planning, and focus.'
+        : 'Latihan meniru pose & gerakan tangan untuk atensi, perencanaan motorik, dan fokus.',
+      video: '/robo_pose_preview.mp4',
+      poster: '/robomind_character_2d.png'
+    },
+    {
+      id: 'pick-and-drop',
+      category: i18n.language === 'en' ? 'Moral & Logic' : 'Moral & Logika',
+      categoryColor: 'from-lime-500 to-green-600',
+      title: 'PICK & DROP: SORTIR NILAI',
+      subtitle: i18n.language === 'en'
+        ? 'Sorting and categorization practice building moral reasoning and logical grouping.'
+        : 'Latihan memilah dan mengelompokkan untuk penalaran moral dan logika klasifikasi.',
+      video: '/pick_and_drop_preview.mp4',
+      poster: '/modul_coding.png'
     }
   ];
 
