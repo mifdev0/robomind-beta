@@ -11,51 +11,7 @@ import {
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Mock data as initial fallback
-const INITIAL_POSTS = [
-  {
-    id: 'post-1',
-    title: 'Tips Melatih Logika Anak Tanpa Gadget',
-    content: 'Seringkali kita bingung bagaimana mengajarkan logika ke anak tanpa screen time berlebih. Di rumah, saya suka pakai balok susun warna-warni dan permainan tebak arah mata angin. Anak saya yang umur 6 tahun jadi lebih cepat memahami konsep instruksi sekuensial sebelum masuk ke game Robo Mind!',
-    category: 'parenting',
-    author_name: 'Bunda Sarah',
-    author_avatar: 'https://ui-avatars.com/api/?name=Bunda+Sarah&background=14B8A6&color=fff&rounded=true',
-    created_at: new Date(Date.now() - 1000 * 60 * 120).toISOString(), // 2 hours ago
-    likes: 12,
-    comments: [
-      { id: 'c-1', author_name: 'Ayah Rian', content: 'Sangat setuju bunda! Permainan unplugged seperti itu sangat membantu membangun fondasi berpikir algoritmik.', created_at: new Date(Date.now() - 1000 * 60 * 90).toISOString() },
-      { id: 'c-2', author_name: 'Mama Alisa', content: 'Wah makasih tipsnya, mau dicoba nanti sore.', created_at: new Date(Date.now() - 1000 * 60 * 60).toISOString() }
-    ],
-    liked_by: []
-  },
-  {
-    id: 'post-2',
-    title: 'Game Pinch & Drop Sangat Membantu Motorik Halus',
-    content: 'Baru seminggu coba fitur game Pinch & Drop di web Robo Mind. Awalnya anak agak kaku menyeret angka-angka di layar tablet, tapi sekarang koordinasi motorik halusnya jauh lebih terlatih, ditambah dia jadi suka hitung-hitungan sederhana.',
-    category: 'games',
-    author_name: 'Papa Dedi',
-    author_avatar: 'https://ui-avatars.com/api/?name=Papa+Dedi&background=3B82F6&color=fff&rounded=true',
-    created_at: new Date(Date.now() - 1000 * 60 * 720).toISOString(), // 12 hours ago
-    likes: 8,
-    comments: [
-      { id: 'c-3', author_name: 'Bunda Sarah', content: 'Betul pa, anak saya juga betah banget main game itu.', created_at: new Date(Date.now() - 1000 * 60 * 500).toISOString() }
-    ],
-    liked_by: []
-  },
-  {
-    id: 'post-3',
-    title: 'Mengenalkan Computational Thinking sejak Usia 5 Tahun',
-    content: 'Computational thinking bukan berarti memaksa anak belajar menulis kode syntax pemrograman rumit. Ini tentang pemecahan masalah (problem solving): dekomposisi, pengenalan pola, abstraksi, dan algoritma dasar. Bagus sekali kurikulum Robo Mind ini merancang tahapannya dengan rapi.',
-    category: 'logic',
-    author_name: 'Dr. Indah (Praktisi Edukasi)',
-    author_avatar: 'https://ui-avatars.com/api/?name=Dr+Indah&background=EC4899&color=fff&rounded=true',
-    created_at: new Date(Date.now() - 1000 * 60 * 1440).toISOString(), // 1 day ago
-    likes: 24,
-    comments: [],
-    liked_by: []
-  }
-];
-
+// Community feed pulls real posts from Supabase (no dummy/seed data)
 const CATEGORIES = [
   { id: 'all', label: { id: 'Semua Kategori', en: 'All Categories' }, icon: <Globe size={18} /> },
   { id: 'sharing', label: { id: 'Sharing Cerita', en: 'Sharing Stories' }, icon: <BookOpen size={18} /> },
@@ -108,34 +64,9 @@ const CommunityPage = () => {
           setPosts(data);
           setIsUsingSupabase(true);
         } else {
-          // If empty, seed with initial mock data
-          const { error: seedError } = await supabase.from('community_posts').insert(
-            INITIAL_POSTS.map(p => ({
-              id: p.id,
-              title: p.title,
-              content: p.content,
-              category: p.category,
-              author_name: p.author_name,
-              author_avatar: p.author_avatar,
-              created_at: p.created_at,
-              likes: p.likes,
-              comments: p.comments,
-              liked_by: p.liked_by
-            }))
-          );
-          
-          if (!seedError) {
-            const { data: seededData } = await supabase
-              .from('community_posts')
-              .select('*')
-              .order('created_at', { ascending: false });
-            if (seededData) {
-              setPosts(seededData);
-              setIsUsingSupabase(true);
-            }
-          } else {
-            loadFromLocalStorage();
-          }
+          // No dummy data: show an empty feed until real posts exist
+          setPosts([]);
+          setIsUsingSupabase(true);
         }
       } catch (err) {
         loadFromLocalStorage();
@@ -154,12 +85,10 @@ const CommunityPage = () => {
       try {
         setPosts(JSON.parse(local));
       } catch {
-        setPosts(INITIAL_POSTS);
-        localStorage.setItem('robomind_community_posts', JSON.stringify(INITIAL_POSTS));
+        setPosts([]);
       }
     } else {
-      setPosts(INITIAL_POSTS);
-      localStorage.setItem('robomind_community_posts', JSON.stringify(INITIAL_POSTS));
+      setPosts([]);
     }
   };
 
@@ -474,7 +403,7 @@ const CommunityPage = () => {
               <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm text-xs space-y-2">
                 <div className="flex items-center gap-2 font-bold text-gray-700">
                   <div className={`w-2.5 h-2.5 rounded-full ${isUsingSupabase ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-                  <span>{isUsingSupabase ? 'Database Cloud Terkoneksi' : 'Mode Demo Offline'}</span>
+                  <span>{isUsingSupabase ? 'Database Cloud Terkoneksi' : 'Mode Offline'}</span>
                 </div>
                 <p className="text-gray-500 leading-relaxed">
                   {isUsingSupabase 

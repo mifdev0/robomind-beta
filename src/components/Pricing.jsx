@@ -21,6 +21,7 @@ const plans = [
       id: 'Akses awal untuk mengenal dunia logika dasar.'
     },
     features: [
+      { text: { en: '1 child profile', id: '1 profil anak' }, included: true },
       { text: { en: 'Access to basic game modules', id: 'Akses modul game dasar' }, included: true },
       { text: { en: 'Monthly general development chart', id: 'Diagram perkembangan umum bulanan' }, included: true },
       { text: { en: 'Weekly AI-powered analysis', id: 'Analisis bertenaga AI mingguan' }, included: false },
@@ -59,6 +60,7 @@ const plans = [
       id: 'Fitur tingkat menengah untuk pertumbuhan kognitif bertahap.'
     },
     features: [
+      { text: { en: 'Up to 2 child profiles', id: 'Hingga 2 profil anak' }, included: true },
       { text: { en: 'Access to basic & intermediate game modules', id: 'Akses modul game dasar & menengah' }, included: true },
       { text: { en: 'Bi-weekly development chart', id: 'Diagram perkembangan 2 mingguan' }, included: true },
       { text: { en: 'Weekly AI-powered analysis (Standard)', id: 'Analisis bertenaga AI mingguan (Standar)' }, included: true },
@@ -97,6 +99,7 @@ const plans = [
       id: 'Pendampingan penuh untuk memaksimalkan potensi si kecil.'
     },
     features: [
+      { text: { en: 'Up to 3 child profiles', id: 'Hingga 3 profil anak' }, included: true },
       { text: { en: 'Access to all interactive game modules', id: 'Akses ke semua modul game interaktif' }, included: true },
       { text: { en: 'Weekly in-depth AI-powered analysis', id: 'Analisis mendalam bertenaga AI secara mingguan' }, included: true },
       { text: { en: '24/7 Unlimited AI Chatbot consultation', id: 'Konsultasi Chatbot AI 24/7 tanpa batas' }, included: true },
@@ -140,6 +143,7 @@ const plans = [
       id: 'Paket terlengkap dengan konsultasi langsung psikolog anak ahli.'
     },
     features: [
+      { text: { en: 'Up to 5 child profiles', id: 'Hingga 5 profil anak' }, included: true },
       { text: { en: 'Access to all game modules & early beta features', id: 'Akses seluruh modul game & fitur beta awal' }, included: true },
       { text: { en: 'Real-time AI diagnostic & analysis reports', id: 'Analisis AI real-time & laporan diagnostik' }, included: true },
       { text: { en: 'Priority 24/7 AI + human expert chat', id: 'Konsultasi prioritas 24/7 AI + psikolog anak' }, included: true },

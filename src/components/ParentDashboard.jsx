@@ -27,18 +27,7 @@ const ParentDashboard = () => {
   const { user } = useAuth();
   
   const [loading, setLoading] = useState(true);
-  const [childrenList, setChildrenList] = useState([
-    {
-      id: 'child-default',
-      name: 'Pemain Baru',
-      level: 1,
-      total_xp: 0,
-      coins: 0,
-      screentime_used: 0,
-      screentime_limit: 60,
-      avatar_url: 'https://ui-avatars.com/api/?name=Pemain+Baru&background=0099ff&color=fff&rounded=true'
-    }
-  ]);
+  const [childrenList, setChildrenList] = useState([]);
   const [selectedChildIndex, setSelectedChildIndex] = useState(0);
 
   const [skills, setSkills] = useState({
@@ -56,6 +45,7 @@ const ParentDashboard = () => {
   const [newChildName, setNewChildName] = useState('');
   const [newChildAge, setNewChildAge] = useState(7);
   const [createdCodeAlert, setCreatedCodeAlert] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   const handleCreateChildProfile = async (e) => {
     e.preventDefault();
@@ -130,10 +120,51 @@ const ParentDashboard = () => {
         console.error("Screentime reset error:", err);
       }
     }
-    alert('✅ Waktu bermain telah direset ke 0 menit!');
+    alert(isEn ? '✅ Daily playtime has been reset to 0 minutes!' : '✅ Waktu bermain telah direset ke 0 menit!');
   };
 
-  const activeChild = childrenList[selectedChildIndex] || childrenList[0];
+  // Delete a child profile together with ALL related data
+  const handleDeleteChild = async () => {
+    const target = deleteTarget;
+    if (!target) return;
+    const childId = target.id;
+    const isReal = childId && !/^(demo-|child-)/i.test(String(childId));
+
+    if (isReal) {
+      try {
+        // Remove everything tied to this child
+        await supabase.from('game_sessions').delete().eq('child_id', childId);
+        await supabase.from('child_skills').delete().eq('child_id', childId);
+        await supabase.from('children').delete().eq('id', childId);
+      } catch (err) {
+        console.error('Delete child profile error:', err);
+      }
+    }
+
+    setChildrenList(prev => {
+      const next = prev.filter(c => c.id !== childId);
+      setSelectedChildIndex(i => Math.max(0, Math.min(i, next.length - 1)));
+      return next;
+    });
+    setDeleteTarget(null);
+    alert(
+      isEn
+        ? `Profile "${target.name}" and all of its data have been deleted.`
+        : `Profil "${target.name}" beserta seluruh datanya telah dihapus.`
+    );
+  };
+
+  const activeChild = childrenList[selectedChildIndex] || childrenList[0] || {
+    id: null,
+    name: '',
+    level: 1,
+    total_xp: 0,
+    coins: 0,
+    screentime_used: 0,
+    screentime_limit: 60,
+    avatar_url: ''
+  };
+  const hasChild = !!(activeChild && activeChild.id);
 
   // Detect dark mode reactively
   const [isDark, setIsDark] = useState(() => {
@@ -263,7 +294,7 @@ const ParentDashboard = () => {
           });
         }
       } catch (err) {
-        console.warn('Using local demo progress data:', err);
+        console.warn('Failed to load parent ecosystem:', err);
       } finally {
         setLoading(false);
       }
@@ -384,6 +415,31 @@ const ParentDashboard = () => {
           )}
         </div>
 
+        {!hasChild && (
+          <div className="mb-6 max-w-xl mx-auto text-center bg-white dark:bg-slate-800 border border-dashed border-cyan-300 dark:border-slate-600 rounded-2xl p-6">
+            <p className="text-gray-600 dark:text-gray-300 font-outfit text-sm mb-4">
+              {!user
+                ? (isEn ? "Please sign in to view your child's real progress data." : 'Silakan login untuk melihat data perkembangan anak Anda.')
+                : (isEn ? 'No child profile yet. Add a child to generate an access code and start syncing real progress.' : 'Belum ada profil anak. Tambahkan anak untuk membuat kode akses dan mulai sinkronisasi data asli.')}
+            </p>
+            {user ? (
+              <button
+                onClick={() => setShowAddChildModal(true)}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs shadow-md transition-all"
+              >
+                ➕ {isEn ? 'Add Child' : 'Tambah Anak'}
+              </button>
+            ) : (
+              <a
+                href="/login"
+                className="inline-block px-5 py-2.5 rounded-2xl bg-cyan-500 hover:bg-cyan-600 text-white font-extrabold text-xs shadow-md transition-all"
+              >
+                {isEn ? 'Sign In' : 'Masuk'}
+              </a>
+            )}
+          </div>
+        )}
+
         <div className="bg-white dark:bg-slate-800 rounded-2xl sm:rounded-3xl shadow-lg sm:shadow-xl border border-gray-100 dark:border-slate-700 overflow-hidden flex flex-col lg:flex-row transition-colors duration-200">
           
           {/* LEFT SIDE: STATS & SUMMARY */}
@@ -408,12 +464,12 @@ const ParentDashboard = () => {
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-300 dark:border-cyan-700 text-xs">
                         <span className="font-bold text-gray-700 dark:text-gray-200">🔑 Kode Akses Game:</span>
                         <span className="font-mono font-black text-cyan-700 dark:text-cyan-300 tracking-widest text-sm">
-                          {activeChild.access_code ? `${activeChild.access_code.slice(0, 4)} - ${activeChild.access_code.slice(4)}` : '1234 - 5678'}
+                          {activeChild.access_code ? `${activeChild.access_code.slice(0, 4)} - ${activeChild.access_code.slice(4)}` : '-'}
                         </span>
                       </div>
                       <button
                         onClick={() => {
-                          const code = activeChild.access_code || '12345678';
+                          const code = activeChild.access_code || '';
                           navigator.clipboard.writeText(code);
                           alert(`✅ Kode Akses (${code}) disalin! Berikan kode ini ke anak untuk masuk di Aplikasi Game.`);
                         }}
@@ -430,6 +486,12 @@ const ParentDashboard = () => {
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Sync
                   </span>
+                  <button
+                    onClick={() => setDeleteTarget(activeChild)}
+                    className="mt-2 flex items-center justify-center gap-1 ml-auto text-[10px] font-bold text-rose-600 dark:text-rose-400 hover:text-white hover:bg-rose-500 border border-rose-300 dark:border-rose-800 px-2.5 py-1 rounded-lg transition-colors"
+                  >
+                    🗑️ {isEn ? 'Delete Profile' : 'Hapus Profil'}
+                  </button>
                 </div>
               </div>
 
@@ -775,6 +837,39 @@ const ParentDashboard = () => {
             >
               {isEn ? 'Copy Code & Finish' : 'Salin Kode & Selesai'}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* CONFIRMATION MODAL: DELETE CHILD PROFILE */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-800 rounded-3xl p-6 max-w-sm w-full border-2 border-rose-400 shadow-2xl text-center">
+            <div className="w-14 h-14 rounded-full bg-rose-100 dark:bg-rose-950/60 text-rose-500 flex items-center justify-center mx-auto mb-3 text-3xl">
+              🗑️
+            </div>
+            <h3 className="text-lg font-extrabold text-gray-900 dark:text-white font-fredoka mb-1">
+              {isEn ? `Delete "${deleteTarget.name}"?` : `Hapus "${deleteTarget.name}"?`}
+            </h3>
+            <p className="text-xs text-gray-500 dark:text-gray-400 mb-5 leading-relaxed">
+              {isEn
+                ? 'All data for this child — progress, level, XP, coins, skills, screentime, and every game session — will be permanently deleted. This action cannot be undone.'
+                : 'Semua data anak ini — progres, level, XP, koin, skill, screentime, dan seluruh riwayat sesi game — akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.'}
+            </p>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 py-3 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 font-bold text-xs transition-colors"
+              >
+                {isEn ? 'Cancel' : 'Batal'}
+              </button>
+              <button
+                onClick={handleDeleteChild}
+                className="flex-1 py-3 rounded-xl bg-rose-500 hover:bg-rose-600 text-white font-extrabold text-xs transition-colors"
+              >
+                {isEn ? 'Yes, Delete' : 'Ya, Hapus'}
+              </button>
+            </div>
           </div>
         </div>
       )}
