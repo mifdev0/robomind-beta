@@ -54,11 +54,6 @@ const Navbar = () => {
     };
   }, []);
 
-  const toggleLanguage = () => {
-    const nextLang = i18n.language === 'id' ? 'en' : 'id';
-    i18n.changeLanguage(nextLang);
-  };
-
   const handleLogout = async () => {
     await signOut();
     window.dispatchEvent(new Event('subscriptionChange'));
@@ -227,17 +222,6 @@ const Navbar = () => {
                 )}
 
                 <div className="space-y-3.5">
-                  {/* Language Selector inside profile dropdown */}
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-600 dark:text-gray-300 font-medium">{i18n.language === 'en' ? 'Language' : 'Bahasa'}</span>
-                    <button 
-                      onClick={toggleLanguage} 
-                      className="bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 px-2.5 py-1.5 rounded-lg font-bold transition-colors uppercase"
-                    >
-                      {i18n.language}
-                    </button>
-                  </div>
-
                   {/* Dark/Light Mode switch inside profile dropdown */}
                   <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-600 dark:text-gray-300 font-medium">{i18n.language === 'en' ? 'Dark Mode' : 'Mode Gelap'}</span>
@@ -369,15 +353,8 @@ const Navbar = () => {
               
               <hr className="border-gray-100 dark:border-slate-800" />
               
-              {/* Settings / Language / Theme Switcher in mobile menu */}
+              {/* Settings / Theme Switcher in mobile menu */}
               <div className="space-y-3 pt-1">
-                <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
-                  <span className="font-medium">{i18n.language === 'en' ? 'Language' : 'Bahasa'}</span>
-                  <button onClick={toggleLanguage} className="bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-lg text-xs font-bold uppercase">
-                    {i18n.language}
-                  </button>
-                </div>
-
                 <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-300">
                   <span className="font-medium">{i18n.language === 'en' ? 'Theme' : 'Tema'}</span>
                   <button 
