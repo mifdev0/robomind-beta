@@ -58,7 +58,8 @@ const ChatbotWidget = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           message: userMsg,
-          messages: validMessages
+          messages: validMessages,
+          lang
         })
       });
 

@@ -221,7 +221,8 @@ const ChatbotPage = () => {
           body: JSON.stringify({ 
             message: textToSend,
             messages: validMessages,
-            stream: true
+            stream: true,
+            lang: isEn ? 'en' : 'id'
           })
         });
 

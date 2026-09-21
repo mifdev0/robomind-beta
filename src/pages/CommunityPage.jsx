@@ -320,7 +320,9 @@ const CommunityPage = () => {
   };
 
   const handleShare = (post) => {
-    const textToCopy = `[Robo Mind Community] "${post.title}" oleh ${post.author_name}. Baca selengkapnya di http://localhost:3000/community`;
+    const textToCopy = i18n.language === 'en'
+      ? `[Robo Mind Community] "${post.title}" by ${post.author_name}. Read more at http://localhost:3000/community`
+      : `[Robo Mind Community] "${post.title}" oleh ${post.author_name}. Baca selengkapnya di http://localhost:3000/community`;
     navigator.clipboard.writeText(textToCopy);
     setShowShareToast(true);
     setTimeout(() => setShowShareToast(false), 2000);
@@ -403,12 +405,14 @@ const CommunityPage = () => {
               <div className="p-4 bg-white border border-gray-200 rounded-2xl shadow-sm text-xs space-y-2">
                 <div className="flex items-center gap-2 font-bold text-gray-700">
                   <div className={`w-2.5 h-2.5 rounded-full ${isUsingSupabase ? 'bg-green-500' : 'bg-amber-500'}`}></div>
-                  <span>{isUsingSupabase ? 'Database Cloud Terkoneksi' : 'Mode Offline'}</span>
+                  <span>{isUsingSupabase
+                    ? (i18n.language === 'en' ? 'Cloud Database Connected' : 'Database Cloud Terkoneksi')
+                    : (i18n.language === 'en' ? 'Offline Mode' : 'Mode Offline')}</span>
                 </div>
                 <p className="text-gray-500 leading-relaxed">
                   {isUsingSupabase 
-                    ? 'Koneksi database Supabase cloud aktif. Cerita disinkronkan secara real-time.' 
-                    : 'Penyimpanan berjalan di Local Sandbox browser Anda. Semua data aman tersimpan secara lokal.'}
+                    ? (i18n.language === 'en' ? 'Supabase cloud database connection is active. Stories are synced in real-time.' : 'Koneksi database Supabase cloud aktif. Cerita disinkronkan secara real-time.') 
+                    : (i18n.language === 'en' ? 'Storage runs on your browser\'s Local Sandbox. All data is safely stored locally.' : 'Penyimpanan berjalan di Local Sandbox browser Anda. Semua data aman tersimpan secara lokal.')}
                 </p>
               </div>
             </div>
@@ -497,7 +501,7 @@ const CommunityPage = () => {
               {/* Search results banner */}
               {searchQuery && (
                 <div className="text-xs font-bold text-gray-500 px-1 py-0.5">
-                  Menampilkan hasil pencarian untuk: <span className="text-gray-800 italic">"{searchQuery}"</span>
+                  {i18n.language === 'en' ? 'Showing search results for:' : 'Menampilkan hasil pencarian untuk:'} <span className="text-gray-800 italic">"{searchQuery}"</span>
                 </div>
               )}
 
@@ -610,7 +614,7 @@ const CommunityPage = () => {
                               <FileText size={20} className="text-primary-500 shrink-0" />
                               <div className="flex-grow truncate">
                                 <p className="font-bold truncate text-gray-800">{post.file_name}</p>
-                                <p className="text-[10px] text-gray-400">Klik untuk mengunduh file</p>
+                                <p className="text-[10px] text-gray-400">{i18n.language === 'en' ? 'Click to download file' : 'Klik untuk mengunduh file'}</p>
                               </div>
                             </a>
                           )}
@@ -748,7 +752,7 @@ const CommunityPage = () => {
               
               {/* Search Widget */}
               <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm space-y-3">
-                <h4 className="font-bold text-gray-900 font-fredoka text-sm uppercase">Cari Diskusi</h4>
+                <h4 className="font-bold text-gray-900 font-fredoka text-sm uppercase">{i18n.language === 'en' ? 'Find Discussions' : 'Cari Diskusi'}</h4>
                 <div className="relative">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                   <input 
@@ -763,14 +767,14 @@ const CommunityPage = () => {
 
               {/* Stats Mini Box */}
               <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm space-y-3.5">
-                <h4 className="font-bold text-gray-900 font-fredoka text-sm uppercase">Statistik Hub</h4>
+                <h4 className="font-bold text-gray-900 font-fredoka text-sm uppercase">{i18n.language === 'en' ? 'Hub Statistics' : 'Statistik Hub'}</h4>
                 <div className="grid grid-cols-2 gap-3 text-center">
                   <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase">Cerita</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">{i18n.language === 'en' ? 'Stories' : 'Cerita'}</span>
                     <h5 className="font-bold text-lg text-primary-600 font-fredoka">{posts.length}</h5>
                   </div>
                   <div className="bg-gray-50 border border-gray-100 p-2.5 rounded-xl">
-                    <span className="text-[10px] font-bold text-gray-400 uppercase">Suka</span>
+                    <span className="text-[10px] font-bold text-gray-400 uppercase">{i18n.language === 'en' ? 'Likes' : 'Suka'}</span>
                     <h5 className="font-bold text-lg text-primary-600 font-fredoka">{totalLikes}</h5>
                   </div>
                 </div>
@@ -780,7 +784,7 @@ const CommunityPage = () => {
               <div className="bg-white rounded-xl border border-gray-200 p-5 shadow-sm space-y-3">
                 <h4 className="font-bold text-gray-900 font-fredoka text-sm uppercase flex items-center gap-2">
                   <Shield size={16} className="text-teal-600" />
-                  <span>Tata Tertib Sharing</span>
+                  <span>{i18n.language === 'en' ? 'Sharing Ground Rules' : 'Tata Tertib Sharing'}</span>
                 </h4>
                 <ul className="space-y-2 text-xs text-gray-500 leading-relaxed list-decimal list-inside font-semibold">
                   <li>{i18n.language === 'en' ? 'Be kind and respect others' : 'Bersikap sopan & saling menghargai'}</li>
@@ -935,10 +939,10 @@ const CommunityPage = () => {
                   {/* Guest Name input (only if guest) */}
                   {!user && (
                     <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-xl">
-                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Tulis sebagai:</span>
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">{i18n.language === 'en' ? 'Post as:' : 'Tulis sebagai:'}</span>
                       <input 
                         type="text" 
-                        placeholder="Masukkan nama panggilan Anda (Opsional)"
+                        placeholder={i18n.language === 'en' ? 'Enter your nickname (Optional)' : 'Masukkan nama panggilan Anda (Opsional)'}
                         value={customAuthorName}
                         onChange={(e) => setCustomAuthorName(e.target.value)}
                         className="flex-grow bg-transparent text-xs font-semibold focus:outline-none text-gray-700 placeholder-gray-400 py-1"
@@ -952,7 +956,7 @@ const CommunityPage = () => {
                     onClick={() => fileInputRef.current?.click()}
                     className="flex items-center justify-between border border-gray-200 rounded-xl p-3 bg-white shadow-sm text-xs font-bold text-gray-500 cursor-pointer hover:bg-gray-50 transition-colors"
                   >
-                    <span>Tambahkan ke postingan Anda</span>
+                    <span>{i18n.language === 'en' ? 'Add to your post' : 'Tambahkan ke postingan Anda'}</span>
                     <div className="flex gap-2.5 text-gray-400">
                       <BookOpen size={16} className="text-pink-500 shrink-0" />
                       <Heart size={16} className="text-teal-500 shrink-0" />

@@ -78,7 +78,9 @@ const ParentDashboard = () => {
 
         if (error) {
           console.error("Supabase insert child error:", error);
-          alert(`⚠️ Profil "${newChildObj.name}" gagal disimpan ke server: ${error.message}. Kode akses tidak akan bisa dipakai di game. Coba buka Dashboard Pemantauan lalu ulangi.`);
+          alert(isEn
+            ? `⚠️ Profile "${newChildObj.name}" failed to save to the server: ${error.message}. The access code cannot be used in the game. Please open the Monitoring Dashboard and try again.`
+            : `⚠️ Profil "${newChildObj.name}" gagal disimpan ke server: ${error.message}. Kode akses tidak akan bisa dipakai di game. Coba buka Dashboard Pemantauan lalu ulangi.`);
           return;
         }
 
@@ -87,7 +89,9 @@ const ParentDashboard = () => {
         }
       } catch (err) {
         console.error("Error creating child profile in Supabase:", err);
-        alert(`⚠️ Gagal menyimpan profil "${newChildObj.name}" ke server. Pastikan Anda sudah login dan cek koneksi internet.`);
+        alert(isEn
+          ? `⚠️ Failed to save profile "${newChildObj.name}" to the server. Please make sure you are logged in and check your internet connection.`
+          : `⚠️ Gagal menyimpan profil "${newChildObj.name}" ke server. Pastikan Anda sudah login dan cek koneksi internet.`);
         return;
       }
     } else {
@@ -102,7 +106,9 @@ const ParentDashboard = () => {
   };
 
   const resetScreentime = async (childId) => {
-    if (!window.confirm('Apakah yakin ingin mereset waktu bermain harian untuk anak ini? Waktu akan direset ke 0 menit.')) return;
+    if (!window.confirm(isEn
+      ? 'Are you sure you want to reset the daily playtime for this child? The time will be reset to 0 minutes.'
+      : 'Apakah yakin ingin mereset waktu bermain harian untuk anak ini? Waktu akan direset ke 0 menit.')) return;
     
     // Optimistic UI update
     setChildrenList(prev => prev.map(c => c.id === childId ? { ...c, screentime_used: 0 } : c));
@@ -462,7 +468,7 @@ const ParentDashboard = () => {
                     {/* 8-Digit Access Code Badge */}
                     <div className="mt-2 flex flex-wrap items-center gap-2">
                       <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl bg-cyan-100 dark:bg-cyan-950/80 border border-cyan-300 dark:border-cyan-700 text-xs">
-                        <span className="font-bold text-gray-700 dark:text-gray-200">🔑 Kode Akses Game:</span>
+                        <span className="font-bold text-gray-700 dark:text-gray-200">🔑 {isEn ? 'Game Access Code:' : 'Kode Akses Game:'}</span>
                         <span className="font-mono font-black text-cyan-700 dark:text-cyan-300 tracking-widest text-sm">
                           {activeChild.access_code ? `${activeChild.access_code.slice(0, 4)} - ${activeChild.access_code.slice(4)}` : '-'}
                         </span>
@@ -471,18 +477,20 @@ const ParentDashboard = () => {
                         onClick={() => {
                           const code = activeChild.access_code || '';
                           navigator.clipboard.writeText(code);
-                          alert(`✅ Kode Akses (${code}) disalin! Berikan kode ini ke anak untuk masuk di Aplikasi Game.`);
+                          alert(isEn
+                            ? `✅ Access Code (${code}) copied! Give this code to your child to sign in to the Game App.`
+                            : `✅ Kode Akses (${code}) disalin! Berikan kode ini ke anak untuk masuk di Aplikasi Game.`);
                         }}
                         className="text-xs font-extrabold px-3 py-1 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white transition-all shadow-sm active:scale-95 flex items-center gap-1"
                       >
-                        📋 Salin Kode
+                        📋 {isEn ? 'Copy Code' : 'Salin Kode'}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 block">Status Sesi</span>
+                  <span className="text-xs font-bold text-gray-500 dark:text-gray-400 block">{isEn ? 'Session Status' : 'Status Sesi'}</span>
                   <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-400 border border-emerald-300 dark:border-emerald-800">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span> Live Sync
                   </span>
@@ -498,9 +506,9 @@ const ParentDashboard = () => {
               {/* Screentime Card */}
               <div className="p-4 rounded-2xl bg-cyan-50/50 dark:bg-slate-900/60 border border-cyan-100 dark:border-cyan-900/40 mb-6">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-gray-700 dark:text-gray-200">⏱️ Waktu Bermain Hari Ini</span>
+                  <span className="text-xs font-bold text-gray-700 dark:text-gray-200">⏱️ {isEn ? 'Playtime Today' : 'Waktu Bermain Hari Ini'}</span>
                   <span className="text-xs font-extrabold text-cyan-600 dark:text-cyan-400">
-                    {activeChild.screentime_used} / {activeChild.screentime_limit} Menit
+                    {activeChild.screentime_used} / {activeChild.screentime_limit} {isEn ? 'Minutes' : 'Menit'}
                   </span>
                 </div>
                 <div className="w-full h-2.5 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
@@ -510,8 +518,8 @@ const ParentDashboard = () => {
                   ></div>
                 </div>
                 <div className="flex items-center justify-between mt-2 text-[10px] text-gray-500 dark:text-gray-400">
-                  <span>Sisa Waktu Aman: {Math.max(0, activeChild.screentime_limit - activeChild.screentime_used)} Menit</span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">Batas Sehat Terjaga ✓</span>
+                  <span>{isEn ? 'Safe Time Left:' : 'Sisa Waktu Aman:'} {Math.max(0, activeChild.screentime_limit - activeChild.screentime_used)} {isEn ? 'Minutes' : 'Menit'}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400 font-bold">{isEn ? 'Healthy Limit Maintained ✓' : 'Batas Sehat Terjaga ✓'}</span>
                   <button
                     onClick={() => resetScreentime(activeChild.id)}
                     className="ml-2 text-xs font-bold text-cyan-400 hover:text-white">
@@ -524,15 +532,15 @@ const ParentDashboard = () => {
               <div className="grid grid-cols-3 gap-3 mb-6">
                 <div className="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 text-center">
                   <div className="text-lg font-black text-cyan-600 dark:text-cyan-400">{skills.logic}%</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">Logika & Coding</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{isEn ? 'Logic & Coding' : 'Logika & Coding'}</div>
                 </div>
                 <div className="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 text-center">
                   <div className="text-lg font-black text-emerald-500">{skills.focus}%</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">Fokus & Refleks</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{isEn ? 'Focus & Reflex' : 'Fokus & Refleks'}</div>
                 </div>
                 <div className="bg-white dark:bg-slate-800 p-3 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 text-center">
                   <div className="text-lg font-black text-amber-500">{skills.moral}%</div>
-                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">Moral & Empati</div>
+                  <div className="text-[10px] text-gray-500 dark:text-gray-400 font-bold">{isEn ? 'Moral & Empathy' : 'Moral & Empati'}</div>
                 </div>
               </div>
             </div>
@@ -612,7 +620,7 @@ const ParentDashboard = () => {
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className="text-emerald-600 dark:text-emerald-400 font-black block">+{s.xp_earned || 50} XP</span>
-                          <span className="text-[10px] text-amber-500 font-bold block">🪙 +{s.coins_earned || 20} Koin</span>
+                          <span className="text-[10px] text-amber-500 font-bold block">🪙 +{s.coins_earned || 20} {isEn ? 'Coins' : 'Koin'}</span>
                         </div>
                       </div>
                     );

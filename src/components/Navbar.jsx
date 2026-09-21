@@ -169,6 +169,24 @@ const Navbar = () => {
 
           {/* Desktop Actions */}
           <div className="hidden md:flex items-center space-x-4">
+
+            {/* Language Toggle */}
+            <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-full p-0.5 border border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => i18n.changeLanguage('id')}
+                aria-label="Bahasa Indonesia"
+                className={`px-2.5 py-1 text-xs font-bold rounded-full transition-colors cursor-pointer ${i18n.language !== 'en' ? 'bg-primary-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+              >
+                ID
+              </button>
+              <button
+                onClick={() => i18n.changeLanguage('en')}
+                aria-label="English"
+                className={`px-2.5 py-1 text-xs font-bold rounded-full transition-colors cursor-pointer ${i18n.language === 'en' ? 'bg-primary-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'}`}
+              >
+                EN
+              </button>
+            </div>
             
             {/* Login button (only visible if not logged in) */}
             {!user && (
@@ -269,6 +287,22 @@ const Navbar = () => {
 
           {/* Mobile menu button */}
           <div className="md:hidden flex items-center gap-3">
+            <div className="flex items-center bg-gray-100 dark:bg-slate-800 rounded-full p-0.5 border border-gray-200 dark:border-slate-700">
+              <button
+                onClick={() => i18n.changeLanguage('id')}
+                aria-label="Bahasa Indonesia"
+                className={`px-2 py-0.5 text-[11px] font-bold rounded-full transition-colors cursor-pointer ${i18n.language !== 'en' ? 'bg-primary-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              >
+                ID
+              </button>
+              <button
+                onClick={() => i18n.changeLanguage('en')}
+                aria-label="English"
+                className={`px-2 py-0.5 text-[11px] font-bold rounded-full transition-colors cursor-pointer ${i18n.language === 'en' ? 'bg-primary-500 text-white shadow-sm' : 'text-gray-500 dark:text-gray-400'}`}
+              >
+                EN
+              </button>
+            </div>
             <button 
               onClick={() => setIsOpen(!isOpen)}
               className="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white focus:outline-none"

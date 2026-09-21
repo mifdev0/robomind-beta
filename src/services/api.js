@@ -26,12 +26,12 @@ export const generateChatResponse = async (messages) => {
   }
 };
 
-export const generateVisionChatResponse = async ({ imageDataUrl, text, messages }) => {
+export const generateVisionChatResponse = async ({ imageDataUrl, text, messages, lang }) => {
   try {
     const response = await fetch('/api/chat-vision', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ imageDataUrl, text, messages })
+      body: JSON.stringify({ imageDataUrl, text, messages, lang: lang || (isEn() ? 'en' : 'id') })
     });
 
     const data = await response.json();

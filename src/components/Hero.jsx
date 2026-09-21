@@ -28,7 +28,7 @@ const Hero = () => {
           loop
           playsInline
           preload="metadata"
-          aria-label="Dokumentasi kelas RoboMind"
+          aria-label={i18n.language === 'en' ? 'RoboMind class documentation' : 'Dokumentasi kelas RoboMind'}
         >
           <source src={heroData.video} type="video/mp4" />
         </video>

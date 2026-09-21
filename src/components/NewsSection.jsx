@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 
 const NewsSection = () => {
   const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
   const [news, setNews] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -24,11 +25,11 @@ const NewsSection = () => {
           return {
             id: index,
             title: item.title,
-            description: cleanDesc.length > 120 ? cleanDesc.substring(0, 120) + "..." : cleanDesc || "Berita dan wawasan terbaru seputar dunia pendidikan dan kurikulum.",
+            description: cleanDesc.length > 120 ? cleanDesc.substring(0, 120) + "..." : cleanDesc || (isEn ? "The latest news and insights on education and curriculum." : "Berita dan wawasan terbaru seputar dunia pendidikan dan kurikulum."),
             img: imgMatch ? imgMatch[1] : "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&auto=format&fit=crop&q=80",
             url: item.link,
             source: item.author || "Global Education",
-            date: new Date(item.pubDate).toLocaleDateString('id-ID', {
+            date: new Date(item.pubDate).toLocaleDateString(isEn ? 'en-US' : 'id-ID', {
               day: 'numeric',
               month: 'long',
               year: 'numeric'
@@ -55,39 +56,39 @@ const NewsSection = () => {
   const fallbackNews = [
     {
       id: 1,
-      title: "Update Kurikulum 2026: Fokus pada Keterampilan Abad 21",
-      description: "Kementerian Pendidikan mengumumkan penyesuaian kurikulum baru yang menitikberatkan pada pemrograman dan AI sejak pendidikan dasar.",
+      title: isEn ? "2026 Curriculum Update: Focus on 21st Century Skills" : "Update Kurikulum 2026: Fokus pada Keterampilan Abad 21",
+      description: isEn ? "The Ministry of Education announced a new curriculum adjustment emphasizing programming and AI from elementary education." : "Kementerian Pendidikan mengumumkan penyesuaian kurikulum baru yang menitikberatkan pada pemrograman dan AI sejak pendidikan dasar.",
       img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=800&auto=format&fit=crop&q=80",
       url: "#",
       source: "Detik Edukasi",
-      date: "23 Juni 2026"
+      date: isEn ? "June 23, 2026" : "23 Juni 2026"
     },
     {
       id: 2,
-      title: "Teknologi AI Ubah Lanskap Pembelajaran Global",
-      description: "Berbagai sekolah di seluruh dunia mulai mengintegrasikan asisten virtual pintar untuk membantu personalisasi pembelajaran siswa.",
+      title: isEn ? "AI Technology Transforms the Global Learning Landscape" : "Teknologi AI Ubah Lanskap Pembelajaran Global",
+      description: isEn ? "Schools around the world are starting to integrate smart virtual assistants to help personalize student learning." : "Berbagai sekolah di seluruh dunia mulai mengintegrasikan asisten virtual pintar untuk membantu personalisasi pembelajaran siswa.",
       img: "https://images.unsplash.com/photo-1488190211105-8b0e65b80b4e?w=800&auto=format&fit=crop&q=80",
       url: "#",
       source: "Tech News Global",
-      date: "22 Juni 2026"
+      date: isEn ? "June 22, 2026" : "22 Juni 2026"
     },
     {
       id: 3,
-      title: "Pentingnya Belajar Robotika Sejak Dini",
-      description: "Studi terbaru menunjukkan anak yang belajar robotika memiliki kemampuan problem solving 40% lebih baik.",
+      title: isEn ? "The Importance of Learning Robotics Early" : "Pentingnya Belajar Robotika Sejak Dini",
+      description: isEn ? "A recent study shows children who learn robotics have 40% better problem-solving skills." : "Studi terbaru menunjukkan anak yang belajar robotika memiliki kemampuan problem solving 40% lebih baik.",
       img: "https://images.unsplash.com/photo-1589254065878-42c9da997008?w=800&auto=format&fit=crop&q=80",
       url: "#",
       source: "Science Daily",
-      date: "20 Juni 2026"
+      date: isEn ? "June 20, 2026" : "20 Juni 2026"
     },
     {
       id: 4,
-      title: "Keterampilan Digital Jadi Syarat Utama Lulusan 2026",
-      description: "Menteri Pendidikan Global menyepakati bahwa literasi digital adalah kunci utama untuk kesuksesan karir generasi mendatang.",
+      title: isEn ? "Digital Skills Become the Main Requirement for 2026 Graduates" : "Keterampilan Digital Jadi Syarat Utama Lulusan 2026",
+      description: isEn ? "Global education ministers agree that digital literacy is the main key to the career success of the next generation." : "Menteri Pendidikan Global menyepakati bahwa literasi digital adalah kunci utama untuk kesuksesan karir generasi mendatang.",
       img: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&auto=format&fit=crop&q=80",
       url: "#",
       source: "Education Week",
-      date: "18 Juni 2026"
+      date: isEn ? "June 18, 2026" : "18 Juni 2026"
     }
   ];
 
